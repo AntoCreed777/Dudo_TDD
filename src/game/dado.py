@@ -15,3 +15,5 @@ class Dado:
         
         if numero in nombres:
             return nombres[numero]
+        
+        raise ValueError("Número inválido")
