@@ -23,8 +23,8 @@ class TestDado:
     
     def test_numero_a_nombre(self, dado):
         assert dado.numero_a_nombre(1) == "As"
-        assert dado.numero_a_nombre(2) == "Dos"
-        assert dado.numero_a_nombre(3) == "Tres"
-        assert dado.numero_a_nombre(4) == "Cuatro"
-        assert dado.numero_a_nombre(5) == "Cinco"
-        assert dado.numero_a_nombre(6) == "Seis"
+        assert dado.numero_a_nombre(2) == "Tonto"
+        assert dado.numero_a_nombre(3) == "Tren"
+        assert dado.numero_a_nombre(4) == "Cuadra"
+        assert dado.numero_a_nombre(5) == "Quina"
+        assert dado.numero_a_nombre(6) == "Sexto"
