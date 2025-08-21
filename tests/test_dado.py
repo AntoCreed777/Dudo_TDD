@@ -28,3 +28,9 @@ class TestDado:
         assert dado.numero_a_nombre(4) == "Cuadra"
         assert dado.numero_a_nombre(5) == "Quina"
         assert dado.numero_a_nombre(6) == "Sexto"
+
+    def test_numero_a_nombre_invalido(self, dado):
+        with pytest.raises(ValueError, match="Número inválido"):
+            dado.numero_a_nombre(0)
+        with pytest.raises(ValueError, match="Número inválido"):
+            dado.numero_a_nombre(7)
