@@ -22,16 +22,11 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Obtener el mensaje del ultimo commit
-        id: commit_msg
-        run: echo "msg=$(git log -1 --pretty=%B)" >> $GITHUB_OUTPUT
-
       - name: Run flake8
         run: flake8 src tests
 
       - name: Run mypy
         run: mypy src
 
-      - name: Correr los Tests (saltar si el commit comienza con RED)
-        if: "!startsWith(steps.commit_msg.outputs.msg, 'RED')"
+      - name: Correr los Tests
         run: pytest
