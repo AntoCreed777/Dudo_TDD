@@ -113,11 +113,14 @@ La documentación se encuentra en los docstrings de las clases y funciones princ
 
 <div align="center">
 
-**Desarrollado con ❤️ para el curso de TESTING Y ASEGURAMIENTO DE LA CALIDAD DE SOFTWARE**
+**Desarrollado con ❤️ por aprender a trabajar con TDD**
 
-📚 **Universidad:** Universidad de Concepción  
+📚 **Universidad:** Universidad de Concepción
+
 🎓 **Curso:**  TESTING Y ASEGURAMIENTO DE LA CALIDAD DE SOFTWARE
+
 📋 **Código curso:** 501405-1
+
 📅 **Semestre:** 2025-2
 
 </div>
