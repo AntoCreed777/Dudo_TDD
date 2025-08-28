@@ -8,9 +8,12 @@ class TestDado:
     def dado(self):
         return Dado()
 
-    def test_generar_numero_del_1_al_6(self, dado):
-        resultado = dado.generar_numero()
-        assert 1 <= resultado <= 6, "El número debe estar entre 1 y 6"
+    def test_generar_numero_del_1_al_6(self, dado, mocker):
+        for enum_val in NombreDado:
+            mocker.patch("random.randint", return_value=enum_val.value)
+            dado.generar_numero()
+            assert dado._valor == enum_val.value, f"El número generado debe ser {enum_val.value}"
+            assert dado.get_valor() == str(enum_val), f"El nombre debe ser {str(enum_val)}"
 
     def test_generar_numeros_multiples(self, dado):
         resultados = [dado.generar_numero() for _ in range(1000)]
