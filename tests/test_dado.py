@@ -1,5 +1,5 @@
 import pytest
-from src.game.dado import Dado
+from src.game.dado import Dado, NombreDado
 
 
 class TestDado:
@@ -24,12 +24,8 @@ class TestDado:
             assert i in resultados, f"El número {i} debería aparecer al menos una vez"
 
     def test_numero_a_nombre(self, dado):
-        assert dado.numero_a_nombre(1) == "As"
-        assert dado.numero_a_nombre(2) == "Tonto"
-        assert dado.numero_a_nombre(3) == "Tren"
-        assert dado.numero_a_nombre(4) == "Cuadra"
-        assert dado.numero_a_nombre(5) == "Quina"
-        assert dado.numero_a_nombre(6) == "Sexto"
+        for enum_val in NombreDado:
+            assert dado.numero_a_nombre(enum_val.value) == str(enum_val)
 
     def test_numero_a_nombre_invalido(self, dado):
         with pytest.raises(ValueError, match="Número inválido"):
