@@ -28,7 +28,8 @@ class TestCacho:
         for dado in cacho._dados:
             if dado._valor is not None:
                 contador += 1
-        assert cantidad_esperada == contador, f"Deben de haber{cantidad_esperada} dados con valores asignados"
+        assert cantidad_esperada == contador, \
+            f"Deben de haber{cantidad_esperada} dados con valores asignados"
 
     def test_agitar_cantidad_invalida(self, cacho):
         with pytest.raises(ValueError, match="Cantidad a agitar invalida"):
