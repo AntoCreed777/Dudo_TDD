@@ -1,0 +1,61 @@
+import pytest
+from src.game.cacho import Cacho
+
+
+class TestCacho:
+
+    @pytest.fixture
+    def cacho(self):
+        return Cacho()
+
+    def test_agitar(self):
+        for cantidad in range(6):   # Pruebo desde 0 hasta 5 dados
+            cacho = Cacho()
+            cacho.agitar(cantidad=cantidad)
+
+            contador = 0
+            contador = sum(1 for dado in cacho._dados if dado._valor is not None)
+
+            assert cantidad == contador, f"Deben de haber{cantidad} dados con valores asignados"
+
+    def test_agitar_cantidad_superior_a_5(self, cacho):
+        cacho.agitar(cantidad=6)
+        contador = 0
+
+        contador = sum(1 for dado in cacho._dados if dado._valor is not None)
+        assert 5 == contador, "Solo deben agitarse 5 dados como máximo"
+
+    def test_agitar_cantidad_invalida(self, cacho):
+        with pytest.raises(ValueError, match="Cantidad a agitar invalida"):
+            cacho.agitar(cantidad=-1)
+
+    def test_get_resultados(self, cacho):
+        cantidad = 5
+
+        cacho.agitar(cantidad=cantidad)
+        resultados = cacho.get_resultados()
+
+        assert len(resultados) == cantidad
+        for resultado in resultados:
+            assert isinstance(resultado, str)
+
+    def test_ocualtar(self, cacho):
+        cacho.agitar(cantidad=1)
+        assert cacho.get_resultados() is not None
+
+        cacho.ocultar()
+        assert cacho.get_resultados() is None, "Si el cacho está oculto, debe retornar None"
+
+    def test_mostrar(self, cacho):
+        cacho.agitar(cantidad=1)
+
+        cacho.ocultar()
+        assert cacho.get_resultados() is None
+
+        cacho.mostrar()
+
+        assert cacho.get_resultados() is not None
+        assert len(cacho.get_resultados()) == 1
+
+    def test_get_resultados_sin_agitar(self, cacho):
+        assert cacho.get_resultados() is None
