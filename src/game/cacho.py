@@ -10,6 +10,12 @@ class Cacho:
             self._dados.append(Dado())
 
     def agitar(self, cantidad: int):
+        if cantidad < 0:
+            raise ValueError("Cantidad a agitar invalida")
+
+        if cantidad > 5:
+            cantidad = 5
+
         resultados = []
         for i in range(cantidad):
             self._dados[i].generar_numero()
