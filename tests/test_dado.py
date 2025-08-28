@@ -38,3 +38,15 @@ class TestDado:
 
         with pytest.raises(ValueError, match="Número inválido"):
             dado.numero_a_nombre(7)
+
+    def test_get_valor_nombre_correcto(self, dado, mocker):
+        from src.game.dado import NombreDado
+        for enum_val in NombreDado:
+            mocker.patch("random.randint", return_value=enum_val.value)
+            dado.generar_numero()
+            assert dado.get_valor() == str(enum_val)
+
+    def test_get_valor_sin_generar_numero(self, dado):
+        dado._valor = None
+        with pytest.raises(ValueError, match="No se ha generado ningún valor todavía"):
+            dado.get_valor()
