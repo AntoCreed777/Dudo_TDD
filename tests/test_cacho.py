@@ -12,24 +12,18 @@ class TestCacho:
         for cantidad in range(6):   # Pruebo desde 0 hasta 5 dados
             cacho = Cacho()
             cacho.agitar(cantidad=cantidad)
+
             contador = 0
-            for dado in cacho._dados:
-                if dado._valor is not None:
-                    contador += 1
+            contador = sum(1 for dado in cacho._dados if dado._valor is not None)
+
             assert cantidad == contador, f"Deben de haber{cantidad} dados con valores asignados"
 
     def test_agitar_cantidad_superior_a_5(self, cacho):
-        cantidad_ingresada = 6
-        cantidad_esperada = 5
-
-        cacho.agitar(cantidad=cantidad_ingresada)
+        cacho.agitar(cantidad=6)
         contador = 0
 
-        for dado in cacho._dados:
-            if dado._valor is not None:
-                contador += 1
-        assert cantidad_esperada == contador, \
-            f"Deben de haber{cantidad_esperada} dados con valores asignados"
+        contador = sum(1 for dado in cacho._dados if dado._valor is not None)
+        assert 5 == contador, "Solo deben agitarse 5 dados como máximo"
 
     def test_agitar_cantidad_invalida(self, cacho):
         with pytest.raises(ValueError, match="Cantidad a agitar invalida"):
@@ -50,7 +44,7 @@ class TestCacho:
         assert cacho.get_resultados() is not None
 
         cacho.ocultar()
-        assert cacho.get_resultados() is None
+        assert cacho.get_resultados() is None, "Si el cacho está oculto, debe retornar None"
 
     def test_mostrar(self, cacho):
         cacho.agitar(cantidad=1)
@@ -61,3 +55,4 @@ class TestCacho:
         cacho.mostrar()
 
         assert cacho.get_resultados() is not None
+        assert len(cacho.get_resultados()) == 1
