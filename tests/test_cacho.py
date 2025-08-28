@@ -44,3 +44,10 @@ class TestCacho:
         assert len(resultados) == cantidad
         for resultado in resultados:
             assert isinstance(resultado, str)
+
+    def test_ocualtar(self, cacho):
+        cacho.agitar(cantidad=1)
+        assert cacho.get_resultados() is not None
+
+        cacho.ocultar()
+        assert cacho.get_resultados() is None
