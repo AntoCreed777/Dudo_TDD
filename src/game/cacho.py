@@ -9,9 +9,8 @@ class Cacho:
         for i in range(5):  # Se crean la cantidad maxima de dados que pueden haber dentro del cacho
             self._dados.append(Dado())
 
-    def agitar(self, cantidad: int) -> list[str]:
+    def agitar(self, cantidad: int):
         resultados = []
         for i in range(cantidad):
             self._dados[i].generar_numero()
             resultados.append(self._dados[i].get_valor())
-        return resultados
