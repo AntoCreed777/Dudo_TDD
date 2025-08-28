@@ -16,15 +16,17 @@ class TestDado:
             assert dado.get_valor() == str(enum_val), f"El nombre debe ser {str(enum_val)}"
 
     def test_generar_numeros_multiples(self, dado):
-        resultados = [dado.generar_numero() for _ in range(1000)]
+        valores = []
+        for _ in range(1000):
+            dado.generar_numero()
+            valores.append(dado._valor)
 
         # Verificar que todos están en rango
-        assert all(1 <= num <= 6 for num in resultados), \
-            "Todos los números deberían estar entre 1 y 6"
+        assert all(1 <= num <= 6 for num in valores), "Todos los números deberían estar entre 1 y 6"
 
         # Verificar que aparezcan todos los números al menos una vez
         for i in range(1, 7):
-            assert i in resultados, f"El número {i} debería aparecer al menos una vez"
+            assert i in valores, f"El número {i} debería aparecer al menos una vez"
 
     def test_numero_a_nombre(self, dado):
         for enum_val in NombreDado:

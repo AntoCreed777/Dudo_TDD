@@ -22,9 +22,12 @@ class NombreDado(Enum):
 
 
 class Dado:
-    def generar_numero(self) -> int:
+    def __init__(self):
+        self._valor = None
+
+    def generar_numero(self):
         import random
-        return random.randint(1, 6)  # [1, 6]
+        self._valor = random.randint(1, 6)
 
     def numero_a_nombre(self, numero: int) -> str:
         try:
@@ -32,3 +35,8 @@ class Dado:
             return str(nombre_enum)
         except ValueError:
             raise ValueError("Número inválido")
+
+    def get_valor(self) -> str:
+        if self._valor is None:
+            raise ValueError("No se ha generado ningún valor todavía")
+        return self.numero_a_nombre(self._valor)
