@@ -56,3 +56,6 @@ class TestCacho:
 
         assert cacho.get_resultados() is not None
         assert len(cacho.get_resultados()) == 1
+
+    def test_get_resultados_sin_agitar(self, cacho):
+        assert cacho.get_resultados() is None
