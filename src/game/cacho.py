@@ -28,7 +28,7 @@ class Cacho:
             resultados.append(self._dados[i].get_valor())
 
     def get_resultados(self) -> list[str] | None:
-        if self._oculto and self._cantidad_agitada == 0:
+        if self._oculto or self._cantidad_agitada == 0:
             return None
 
         resultados = []
