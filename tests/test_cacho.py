@@ -51,3 +51,13 @@ class TestCacho:
 
         cacho.ocultar()
         assert cacho.get_resultados() is None
+
+    def test_mostrar(self, cacho):
+        cacho.agitar(cantidad=1)
+
+        cacho.ocultar()
+        assert cacho.get_resultados() is None
+
+        cacho.mostrar()
+
+        assert cacho.get_resultados() is not None
