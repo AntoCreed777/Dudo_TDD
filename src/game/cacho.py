@@ -38,3 +38,6 @@ class Cacho:
 
     def ocultar(self):
         self._oculto = True
+
+    def mostrar(self):
+        self._oculto = False
