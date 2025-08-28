@@ -13,4 +13,4 @@ class TestJugador:
 
         captura = capsys.readouterr()
 
-        assert captura.out == "Cacho Agitado"
+        assert captura.out == "Cacho Agitado\n"
