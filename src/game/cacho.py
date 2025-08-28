@@ -1,0 +1,2 @@
+class Cacho:
+    pass
