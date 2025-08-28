@@ -8,10 +8,15 @@ class TestCacho:
     def cacho(self):
         return Cacho()
 
-    def test_agitar(self, cacho):
+    def test_agitar(self):
         for cantidad in range(6):   # Pruebo desde 0 hasta 5 dados
-            resultados = cacho.agitar(cantidad=cantidad)
-            assert len(resultados) == cantidad
+            cacho = Cacho()
+            cacho.agitar(cantidad=cantidad)
+            contador = 0
+            for dado in cacho._dados:
+                if dado._valor is not None:
+                    contador += 1
+            assert cantidad == contador, f"Deben de haber{cantidad} dados con valores asignados"
 
     def test_agitar_cantidad_superior_a_5(self, cacho):
         cantidad_ingresada = 6
