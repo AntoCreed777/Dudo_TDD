@@ -22,6 +22,8 @@ class NombreDado(Enum):
 
 
 class Dado:
+    _valor: int | None
+
     def __init__(self):
         self._valor = None
 
