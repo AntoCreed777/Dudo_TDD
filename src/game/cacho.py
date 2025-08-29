@@ -17,7 +17,7 @@ class Cacho:
         self._oculto = False
         self._cantidad_agitada = 0
         self._dados = []
-        for i in range(5):  # Se crean la cantidad maxima de dados que pueden haber dentro del cacho
+        for _ in range(5):  # Se crean la cantidad maxima de dados que pueden haber dentro del cacho
             self._dados.append(Dado())
 
     def agitar(self, cantidad: int):
@@ -25,8 +25,7 @@ class Cacho:
         if cantidad < 0:
             raise ValueError("Cantidad a agitar invalida")
 
-        if cantidad > 5:
-            cantidad = 5
+        cantidad = min(cantidad, 5)
 
         self._cantidad_agitada = cantidad
 

@@ -45,8 +45,8 @@ class Dado:
         try:
             nombre_enum = NombreDado(numero)
             return str(nombre_enum)
-        except ValueError:
-            raise ValueError("Número inválido")
+        except ValueError as exc:
+            raise ValueError("Número inválido") from exc
 
     def get_valor(self) -> str:
         """Devuelve el nombre del valor actual del dado."""

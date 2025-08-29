@@ -6,6 +6,9 @@ from src.game.dado import NombreDado
 class Apuesta:
     """Clase que representa una apuesta en el juego Dudo."""
 
+    # Luego hay que eliminar estos comentarios
+    # pylint: disable=too-few-public-methods
+
     def __init__(self, cantidad: int, pinta: NombreDado):
         """Inicializa una apuesta con cantidad y pinta."""
         self.cantidad = cantidad

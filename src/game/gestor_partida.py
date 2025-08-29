@@ -13,7 +13,7 @@ class GestorPartida:
         self.cantidad_jugadores = cantidad_jugadores
         self.direccion_juego = 0
         self._turno_actual = 0
-        for i in range(cantidad_jugadores):
+        for _ in range(cantidad_jugadores):
             self._jugadores.append(Jugador())
 
     def definir_primer_jugador(self):
