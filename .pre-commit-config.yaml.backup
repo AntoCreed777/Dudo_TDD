@@ -1,6 +1,0 @@
-      - id: pylint
-        name: Pylint
-        entry: pylint
-        args: [src tests]
-        language: system
-        types: [python]
