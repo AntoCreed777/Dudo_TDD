@@ -24,11 +24,11 @@ class GestorPartida:
                 if num[1] > numero_mayor:
                     indice_numero_mayor = num[0]
                     numero_mayor = num[1]
-                    repeticiones=1
+                    repeticiones = 1
                 elif num[1] == numero_mayor:
-                    repeticiones+=1
+                    repeticiones += 1
 
-            if repeticiones==1:
+            if repeticiones == 1:
                 break
 
             numeros_aux = []
