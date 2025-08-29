@@ -42,6 +42,6 @@ class Dado:
         if self._valor is None:
             raise ValueError("No se ha generado ningún valor todavía")
         return self.numero_a_nombre(self._valor)
-    
+
     def get_valor_numerico(self):
         return self._valor
