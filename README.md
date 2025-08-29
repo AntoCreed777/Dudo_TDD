@@ -26,7 +26,7 @@ Implementación de un simulador del juego chileno llamado "Dudo" que maneje la l
   - [🧪 Metodología de Desarrollo](#-metodología-de-desarrollo)
   - [📚 Documentación del Código](#-documentación-del-código)
   - [📝 Convenciones](#-convenciones)
-
+  - [🤝 Contribuir](#-contribuir)
 
 
 ## 🛠️ Tecnologías Utilizadas
@@ -54,43 +54,43 @@ Implementación de un simulador del juego chileno llamado "Dudo" que maneje la l
 
 - **Sistema operativo:** Linux, macOS, o Windows con WSL
 - **Python 3.8+**
-- **pip** para gestión de paquetes Python
+- **pdm** para gestión de dependencias y entornos
 
 ## ⚙️ Instalación
 
 ```bash
 git clone https://github.com/AntoCreed777/Dudo_TDD
 cd Dudo_TDD
-pip install -r requirements.txt
+pdm install
 ```
 
 ## 🗂️ Estructura del Proyecto
 
 ```
-Dudo_TDD/
-├── README
-├── pytest.ini
-├── requirements.txt
-├── src/
-│   ├── __init__.py
-│   ├── game/
-│   │   ├── __init__.py
-│   │   ├── arbitro_ronda.py
-│   │   ├── cacho.py
-│   │   ├── contador_pintas.py
-│   │   ├── dado.py
-│   │   ├── gestor_partida.py
-│   │   └── validador_apuesta.py
-│   └── services/
-│       ├── __init__.py
-│       └── generador_aleatorio.py
-└── tests/
-  ├── test_arbitro_ronda.py
-  ├── test_cacho.py
-  ├── test_contador_pintas.py
-  ├── test_dado.py
-  ├── test_gestor_partida.py
-  └── test_validador_apuesta.py
+ Dudo_TDD/
+├──  conventions.md
+├──  pyproject.toml
+├──  README
+├── 󱧼 src/
+│   ├──  __init__.py
+│   ├──  game/
+│   │   ├──  __init__.py
+│   │   ├──  arbitro_ronda.py
+│   │   ├──  cacho.py
+│   │   ├──  contador_pintas.py
+│   │   ├──  dado.py
+│   │   ├──  gestor_partida.py
+│   │   └──  validador_apuesta.py
+│   └──  services/
+│       ├──  __init__.py
+│       └──  generador_aleatorio.py
+└── 󰙨 tests/
+  ├──  test_arbitro_ronda.py
+  ├──  test_cacho.py
+  ├──  test_contador_pintas.py
+  ├──  test_dado.py
+  ├──  test_gestor_partida.py
+  └──  test_validador_apuesta.py
 ```
 
 
@@ -108,6 +108,16 @@ La documentación se encuentra en los docstrings de las clases y funciones princ
 ## 📝 Convenciones
 
 - Consulta [`conventions.md`](./conventions.md) para las reglas de estilo y buenas prácticas del proyecto.
+
+## 🤝 Contribuir
+
+Si vas a aportar a este repositorio, instala pre-commit para asegurar la calidad del código antes de cada commit:
+
+```bash
+pdm add --dev pre-commit
+pre-commit install
+```
+Esto ejecutará automáticamente los hooks configurados en `.pre-commit-config.yaml`.
 
 ---
 

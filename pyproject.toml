@@ -1,7 +1,7 @@
 [project]
 name = "dudo_tdd"
 version = "0.1.0"
-description = "Juego Dudo con TDD"
+description = "Implementación de un simulador del juego chileno llamado \"Dudo\" que maneje la lógica central del juego usando TDD."
 requires-python = ">=3.9"
 authors = [
 	{name = "Antonio Jesus Benavides Puentes", email = "antbenavides@udec.cl"},
