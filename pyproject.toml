@@ -1,0 +1,48 @@
+[project]
+name = "dudo_tdd"
+version = "0.1.0"
+description = "Juego Dudo con TDD"
+requires-python = ">=3.9"
+authors = [
+	{name = "Antonio Jesus Benavides Puentes", email = "antbenavides@udec.cl"},
+	{name = "Ricardo Andres Charris Jimenez", email = "rcharris2022@udec.CL"},
+	{name = "Martin Nicolas Fuentealba Bizama", email = "martfuentealba2023@udec.cl"}
+]
+
+dependencies = [
+	"flake8>=7.0.0",
+	"mypy>=1.0.0",
+	"pytest>=8.0.0",
+	"pytest-cov>=6.0.0",
+	"pytest-mock>=3.14.1",
+	"pylint>=3.3.0",
+	"black>=25.0.0",
+	"isort>=6.0.0",
+	"pydocstyle>=6.3.0",
+    "pdm>=2.25.0"
+]
+
+[tool.pytest.ini_options]
+pythonpath = "."
+testpaths = ["tests"]
+addopts = "--cov=src --cov-report=term-missing"
+
+[tool.mypy]
+python_version = "3.12"
+ignore_missing_imports = true
+
+[tool.pydocstyle]
+ignore-decorators = ""
+match = "(?!__init__\\.py).*"
+
+[tool.flake8]   # Flake8 no lee esta configuracion, lee desde el archivo .flake8
+exclude = ".venv,__pycache__"
+max-line-length = 100
+
+[tool.black]
+line-length = 100
+target-version = ['py312']
+
+[tool.isort]
+profile = "black"
+line_length = 100

@@ -134,3 +134,4 @@ target/
 Thumbs.db
 ehthumbs.db
 Desktop.ini
+pdm.lock
