@@ -24,7 +24,6 @@ dependencies = [
 
 [tool.pytest.ini_options]
 pythonpath = "."
-testpaths = ["tests"]
 addopts = "--cov=src --cov-report=term-missing"
 
 [tool.mypy]
@@ -34,6 +33,7 @@ ignore_missing_imports = true
 [tool.pydocstyle]
 ignore-decorators = ""
 match = "(?!__init__\\.py).*"
+match-dir = "^(?!__pycache__).*$"
 
 [tool.flake8]   # Flake8 no lee esta configuracion, lee desde el archivo .flake8
 exclude = ".venv,__pycache__"

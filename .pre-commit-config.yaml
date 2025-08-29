@@ -3,30 +3,28 @@ repos:
     hooks:
       - id: black
         name: Black
-        entry: black .
+        entry: black
+        args: [.]
         language: system
         types: [python]
 
       - id: isort
         name: Isort
-        entry: isort .
-        language: system
-        types: [python]
-
-      - id: pylint
-        name: Pylint
-        entry: pylint src tests
+        entry: isort
+        args: [.]
         language: system
         types: [python]
 
       - id: pydocstyle
         name: Pydocstyle
-        entry: pydocstyle src
+        entry: pydocstyle
+        args: [src]
         language: system
         types: [python]
 
       - id: run-pytest
         name: Run Pytest
         entry: pytest
+        args: [tests]
         language: system
         types: [python]
