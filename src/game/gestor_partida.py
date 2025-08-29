@@ -4,20 +4,18 @@ from src.game.dado import Dado
 
 class GestorPartida:
     def __init__(self, cantidad_jugadores):
-        self.jugadores = []
-        self.turno_actual = 0
+        self._jugadores = []
+        self._turno_actual = 0
         for i in range(cantidad_jugadores):
-            self.jugadores.append(Jugador())
-        
+            self._jugadores.append(Jugador())
 
-    
     def definir_primer_jugador(self):
         dado = Dado()
         numeros = []
-        for i in range(len(self.jugadores)):
+        for i in range(len(self._jugadores)):
             dado.generar_numero()
             numeros.append([i, dado.get_valor_numerico()])
-        
+
         while True:
             repeticiones = 1
             indice_numero_mayor = -1
@@ -29,16 +27,16 @@ class GestorPartida:
                     repeticiones=1
                 elif num[1] == numero_mayor:
                     repeticiones+=1
-        
+
             if repeticiones==1:
                 break
 
-            numeros = []
+            numeros_aux = []
             for num in numeros:
                 if num[1] == numero_mayor:
                     dado.generar_numero()
-                    numeros.append([num[0], dado.get_valor_numerico()])
-        
-        self.turno_actual = indice_numero_mayor
+                    numeros_aux.append([num[0], dado.get_valor_numerico()])
 
-            
+            numeros = numeros_aux
+
+        self._turno_actual = indice_numero_mayor
