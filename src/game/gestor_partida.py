@@ -46,9 +46,9 @@ class GestorPartida:
     def definir_direccion_juego(self):
         direccion = ""
         while direccion.lower() != "1" and direccion.lower() != "-1":
-            direccion = input(f"Jugador {self._turno_actual + 1}:\nIngresa (1) si quieres que la"
-            f" dirección sea hacia el jugador {(self._turno_actual + 1) % self.cantidad_jugadores + 1}.\nIngresa (-1) si quieres que la"
-            f" dirección sea hacia el jugador {5 if self._turno_actual == 0 else self._turno_actual}")
+            direccion = input(f"Jugador {self._turno_actual + 1}:\nIngresa (1) si quieres que la dirección sea hacia el jugador"
+                              f" {(self._turno_actual + 1) % self.cantidad_jugadores + 1}.\nIngresa (-1) si quieres que la"
+                              f" dirección sea hacia el jugador {5 if self._turno_actual == 0 else self._turno_actual}")
 
         if direccion == "1":
             self.direccion_juego = 1
