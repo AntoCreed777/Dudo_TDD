@@ -8,7 +8,7 @@ Implementación de un simulador del juego chileno llamado "Dudo" que maneje la l
 |--------|--------|-----------|
 | Antonio Jesus Benavides Puentes | [@AntoCreed777](https://github.com/AntoCreed777) | 2023455954 |
 | Ricardo Andres Charris Jimenez | [@RicardoCharris14](https://github.com/RicardoCharris14) | 2022452901 |
-| Martin Nicolas Fuentealba Bizama | [@martin777pro](https://github.com/martin777pro) | -- |
+| Martin Nicolas Fuentealba Bizama | [@martin777pro](https://github.com/martin777pro) | 2023434272 |
 
 ## 📋 Tabla de Contenidos
 
