@@ -15,7 +15,7 @@ class TestGestorPartida:
     def test_definir_primer_jugador(self, mocker, gestor_4_jugadores):
         mocker.patch("src.game.dado.random.randint", side_effect=[2, 2, 5, 2])
         gestor_4_jugadores.definir_primer_jugador()
-        assert gestor_4_jugadores.turno_actual == gestor_4_jugadores.gestor_4_jugadores[2]
+        assert gestor_4_jugadores.turno_actual == 2
     
     @pytest.mark.skip(reason="Test aun no implementado")
     def test_jugar_ronda(self):

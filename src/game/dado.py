@@ -1,4 +1,5 @@
 from enum import Enum
+import random
 
 
 class NombreDado(Enum):
@@ -28,7 +29,6 @@ class Dado:
         self._valor = None
 
     def generar_numero(self):
-        import random
         self._valor = random.randint(1, 6)
 
     def numero_a_nombre(self, numero: int) -> str:
@@ -42,3 +42,6 @@ class Dado:
         if self._valor is None:
             raise ValueError("No se ha generado ningún valor todavía")
         return self.numero_a_nombre(self._valor)
+    
+    def get_valor_numerico(self):
+        return self._valor
