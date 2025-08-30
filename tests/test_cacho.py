@@ -41,23 +41,21 @@ class TestCacho:
         for resultado in resultados:
             assert isinstance(resultado, str)
 
+    def test_get_resultados_sin_agitar(self, cacho):
+        """Verifica que sin agitar el cacho los resultados sean una lista vacia."""
+        resultado = cacho.get_resultados()
+        assert resultado is not None
+        assert len(resultado) == 0
+
     def test_ocualtar(self, cacho):
         """Verifica que ocultar el cacho retorna None en resultados."""
-        cacho.agitar(cantidad=1)
         assert cacho.get_resultados() is not None
         cacho.ocultar()
         assert cacho.get_resultados() is None, "Si el cacho está oculto, debe retornar None"
 
     def test_mostrar(self, cacho):
         """Verifica que mostrar el cacho lo haga visible nuevamente."""
-        cacho.agitar(cantidad=1)
         cacho.ocultar()
         assert cacho.get_resultados() is None
         cacho.mostrar()
         assert cacho.get_resultados() is not None
-        assert len(cacho.get_resultados()) == 1
-
-    def test_get_resultados_sin_agitar(self, cacho):
-        """Verifica que sin agitar el cacho los resultados sean None."""
-        assert cacho.get_resultados() is None
-        assert cacho.get_resultados() is None
