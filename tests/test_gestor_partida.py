@@ -42,6 +42,11 @@ class TestGestorPartida:
         gestor_4_jugadores.definir_direccion_juego()
         assert gestor_4_jugadores.direccion_juego == -1
 
+    def test_solicitar_apuesta(self, mocker, gestor_4_jugadores):
+        mocker.patch("builtins.input", return_value="1")
+        mocker.patch("builtins.input", return_value="3 cuadra")
+        assert gestor_4_jugadores.solicitar_apuesta_jugador_actual() == "subir 3 cuadra"
+
     @pytest.mark.skip(reason="Test aun no implementado")
     def test_jugar_ronda(self):
         """Test pendiente para jugar una ronda."""
