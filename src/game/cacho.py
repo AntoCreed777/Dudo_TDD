@@ -36,7 +36,7 @@ class Cacho:
 
     def get_resultados(self) -> list[str] | None:
         """Devuelve los resultados de los dados agitados si el cacho está visible."""
-        if self._oculto or self._cantidad_agitada == 0:
+        if self._oculto:
             return None
 
         resultados = []

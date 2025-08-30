@@ -24,7 +24,12 @@ class Jugador:
         print("Tu cacho:")
 
         resultados = self._cacho.get_resultados()
+
         if resultados is None:
+            print("\tEsta Oculto, no puedes ver el contenido")
+            return
+
+        if len(resultados) == 0:
             print("\tNo tienes dados para ver, tu cacho esta vacio")
             return
 

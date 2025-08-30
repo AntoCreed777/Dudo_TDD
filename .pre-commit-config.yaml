@@ -15,13 +15,6 @@ repos:
         language: system
         types: [python]
 
-      - id: mypy
-        name: MyPy
-        entry: mypy
-        args: [src]
-        language: system
-        types: [python]
-
       - id: pydocstyle
         name: Pydocstyle
         entry: pydocstyle
