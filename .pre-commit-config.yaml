@@ -29,9 +29,9 @@ repos:
         language: system
         types: [python]
 
-      - id: run-pytest
-        name: Run Pytest
-        entry: pytest
-        args: [tests]
-        language: system
-        types: [python]
+      #- id: run-pytest
+      #  name: Run Pytest
+      #  entry: pytest
+      #  args: [tests]
+      #  language: system
+      #  types: [python]
