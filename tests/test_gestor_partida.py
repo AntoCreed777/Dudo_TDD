@@ -44,6 +44,7 @@ class TestGestorPartida:
         assert gestor_4_jugadores._direccion_juego == -1
 
     def test_solicitar_apuesta(self, mocker, gestor_4_jugadores):
+        """Verifica que se puedan solicitar apuestas al siguiente Jugador."""
         mocker.patch("builtins.input", side_effect=["1", "3 cuadra"])
         assert gestor_4_jugadores.solicitar_apuesta_a_jugador() == "subir 3 cuadra"
         mocker.patch("builtins.input", return_value="2")
@@ -54,12 +55,12 @@ class TestGestorPartida:
         assert gestor_4_jugadores.solicitar_apuesta_a_jugador() == "calzar"
 
     def test_eliminar_jugador(self, gestor_4_jugadores):
-        """verifica que se elimine un jugador cuando se queda sin dados"""
+        """Verifica que se elimine un jugador cuando se queda sin dados."""
         cantidad_previa_jugadores = len(gestor_4_jugadores._jugadores)
         gestor_4_jugadores._jugadores[0]._dados_en_posicion = 0
         assert gestor_4_jugadores._jugadores[0].get_cantidad_dados() == 0
         gestor_4_jugadores.eliminar_jugador(0)
-        assert len(gestor_4_jugadores._jugadores) == cantidad_previa_jugadores-1
+        assert len(gestor_4_jugadores._jugadores) == cantidad_previa_jugadores - 1
 
     @pytest.mark.skip(reason="Test aun no implementado")
     def test_jugar_ronda(self):

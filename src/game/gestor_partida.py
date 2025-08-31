@@ -71,10 +71,13 @@ class GestorPartida:
             self._direccion_juego = -1
 
     def solicitar_apuesta_a_jugador(self) -> str:
-        apuesta: str = self._jugadores[self._turno_actual].realizar_apuesta(self._apuesta_anterior,
-                                                                            self._apuesta_actual)
+        """Solicita al Jugador actual que realize su apuesta."""
+        apuesta: str = self._jugadores[self._turno_actual].realizar_apuesta(
+            self._apuesta_anterior, self._apuesta_actual
+        )
         return apuesta
 
     def eliminar_jugador(self, indice_jugador: int):
+        """Elimina a un Jugador de los Jugadores en Juego."""
         if self._jugadores[indice_jugador].get_cantidad_dados() == 0:
             self._jugadores.pop(indice_jugador)

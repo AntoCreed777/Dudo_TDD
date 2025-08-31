@@ -38,6 +38,7 @@ class Jugador:
             print(f"\tDado {i + 1}: {resultado}")
 
     def realizar_apuesta(self, apuesta_anterior: str, apuesta_actual: str) -> str:
+        """Permite al Jugador realizar una apuesta."""
         hay_apuesta_anterior: bool = apuesta_anterior != ""
         hay_apuesta_actual: bool = apuesta_actual != ""
         indicaciones = "\n"
@@ -70,10 +71,15 @@ class Jugador:
         if apuesta == "1":
             pintas = ["as", "tonto", "tren", "cuadra", "quina", "sexto"]
             apuesta = ""
-            while (len(apuesta.split(" ")) != 2 or not apuesta.split(" ")[0].isdigit()
-                   or apuesta.split(" ")[1].lower() not in pintas):
-                apuesta = input("\nIngrese la cantidad de dados seguido de la pinta a estimar "
-                                "separados por un espacio (Ej: 5 tren):\nR: ")
+            while (
+                len(apuesta.split(" ")) != 2
+                or not apuesta.split(" ")[0].isdigit()
+                or apuesta.split(" ")[1].lower() not in pintas
+            ):
+                apuesta = input(
+                    "\nIngrese la cantidad de dados seguido de la pinta a estimar "
+                    "separados por un espacio (Ej: 5 tren):\nR: "
+                )
             return ("subir " + apuesta).strip()
         elif apuesta == "2":
             return "pasar"
@@ -81,6 +87,7 @@ class Jugador:
             return "dudar"
         else:
             return "calzar"
-    
+
     def get_cantidad_dados(self) -> int:
+        """Retorna la cantidad de dados en posecion."""
         return self._dados_en_posecion
