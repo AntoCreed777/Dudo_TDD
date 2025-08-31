@@ -10,11 +10,14 @@ class GestorPartida:
     def __init__(self, cantidad_jugadores):
         """Inicializa el gestor de partida con la cantidad de jugadores indicada."""
         self._jugadores = []
-        self.cantidad_jugadores = cantidad_jugadores
-        self.direccion_juego = 0
+        self._direccion_juego = 0
         self._turno_actual = 0
+        self._apuesta_anterior = ""
+        self._apuesta_actual = ""
+
         for _ in range(cantidad_jugadores):
-            self._jugadores.append(Jugador())
+            nombre = input(f"\nIngrese el nombre del jugador {_}: ")
+            self._jugadores.append(Jugador(nombre))
 
     def definir_primer_jugador(self):
         """Define el primer jugador que inicia la partida lanzando el dado."""
@@ -56,13 +59,18 @@ class GestorPartida:
             mensaje = (
                 f"Jugador {self._turno_actual + 1}:\n"
                 f"Ingresa (1) si quieres que la dirección sea hacia el jugador "
-                f"{(self._turno_actual + 1) % self.cantidad_jugadores + 1}.\n"
+                f"{(self._turno_actual + 1) % len(self._jugadores) + 1}.\n"
                 f"Ingresa (-1) si quieres que la dirección sea hacia el jugador "
                 f"{5 if self._turno_actual == 0 else self._turno_actual}"
             )
             direccion = input(mensaje)
 
         if direccion == "1":
-            self.direccion_juego = 1
+            self._direccion_juego = 1
         else:
-            self.direccion_juego = -1
+            self._direccion_juego = -1
+
+    def solicitar_apuesta_a_jugador(self) -> str:
+        apuesta: str = self._jugadores[self._turno_actual].realizar_apuesta(self._apuesta_anterior,
+                                                                            self._apuesta_actual)
+        return apuesta
