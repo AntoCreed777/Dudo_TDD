@@ -79,5 +79,5 @@ class Jugador:
             return "pasar"
         elif apuesta == "3":
             return "dudar"
-        elif apuesta == "4":
+        else:
             return "calzar"
