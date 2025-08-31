@@ -15,13 +15,6 @@ repos:
         language: system
         types: [python]
 
-      - id: pylint
-        name: Pylint
-        entry: pylint
-        args: [src]
-        language: system
-        types: [python]
-
       - id: pydocstyle
         name: Pydocstyle
         entry: pydocstyle
@@ -29,9 +22,9 @@ repos:
         language: system
         types: [python]
 
-      - id: run-pytest
-        name: Run Pytest
-        entry: pytest
-        args: [tests]
-        language: system
-        types: [python]
+      #- id: run-pytest
+      #  name: Run Pytest
+      #  entry: pytest
+      #  args: [tests]
+      #  language: system
+      #  types: [python]

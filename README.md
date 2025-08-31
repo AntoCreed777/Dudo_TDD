@@ -67,30 +67,30 @@ pdm install
 ## 🗂️ Estructura del Proyecto
 
 ```
- Dudo_TDD/
-├──  conventions.md
-├──  pyproject.toml
-├──  README
-├── 󱧼 src/
-│   ├──  __init__.py
-│   ├──  game/
-│   │   ├──  __init__.py
-│   │   ├──  arbitro_ronda.py
-│   │   ├──  cacho.py
-│   │   ├──  contador_pintas.py
-│   │   ├──  dado.py
-│   │   ├──  gestor_partida.py
-│   │   └──  validador_apuesta.py
-│   └──  services/
-│       ├──  __init__.py
-│       └──  generador_aleatorio.py
-└── 󰙨 tests/
-  ├──  test_arbitro_ronda.py
-  ├──  test_cacho.py
-  ├──  test_contador_pintas.py
-  ├──  test_dado.py
-  ├──  test_gestor_partida.py
-  └──  test_validador_apuesta.py
+Dudo_TDD/
+├── conventions.md
+├── pyproject.toml
+├── README
+├── src/
+│   ├── __init__.py
+│   ├── game/
+│   │   ├── __init__.py
+│   │   ├── arbitro_ronda.py
+│   │   ├── cacho.py
+│   │   ├── contador_pintas.py
+│   │   ├── dado.py
+│   │   ├── gestor_partida.py
+│   │   └── validador_apuesta.py
+│   └── services/
+│       ├── __init__.py
+│       └── generador_aleatorio.py
+└── tests/
+    ├── test_arbitro_ronda.py
+    ├── test_cacho.py
+    ├── test_contador_pintas.py
+    ├── test_dado.py
+    ├── test_gestor_partida.py
+    └── test_validador_apuesta.py
 ```
 
 

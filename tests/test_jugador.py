@@ -28,7 +28,8 @@ class TestJugador:
                 [str(NombreDado.QUINA), str(NombreDado.TONTO)],
                 "Cacho Agitado\nTu cacho:\n\tDado 1: Quina\n\tDado 2: Tonto\n",
             ),
-            (None, "Cacho Agitado\nTu cacho:\n\tNo tienes dados para ver, tu cacho esta vacio\n"),
+            ([], "Cacho Agitado\nTu cacho:\n\tNo tienes dados para ver, tu cacho esta vacio\n"),
+            (None, "Cacho Agitado\nTu cacho:\n\tEsta Oculto, no puedes ver el contenido\n"),
         ],
     )
     def test_ver_cacho(self, mocker, capsys, jugador, parametros_input, impresion_esperada):
