@@ -1,6 +1,7 @@
 """Módulo que contiene la clase Jugador para el juego Dudo."""
 
 from src.game.cacho import Cacho
+from src.game.dado import NombreDado
 
 
 class Jugador:
@@ -69,7 +70,7 @@ class Jugador:
             apuesta = input(indicaciones)
 
         if apuesta == "1":
-            pintas = ["as", "tonto", "tren", "cuadra", "quina", "sexto"]
+            pintas = [str(pinta).lower() for pinta in NombreDado]
             apuesta = ""
             while (
                 len(apuesta.split(" ")) != 2
