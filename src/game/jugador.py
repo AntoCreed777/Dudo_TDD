@@ -81,3 +81,6 @@ class Jugador:
             return "dudar"
         else:
             return "calzar"
+    
+    def get_cantidad_dados(self) -> int:
+        return self._dados_en_posecion

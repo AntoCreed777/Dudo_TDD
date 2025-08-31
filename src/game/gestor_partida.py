@@ -74,3 +74,7 @@ class GestorPartida:
         apuesta: str = self._jugadores[self._turno_actual].realizar_apuesta(self._apuesta_anterior,
                                                                             self._apuesta_actual)
         return apuesta
+
+    def eliminar_jugador(self, indice_jugador: int):
+        if self._jugadores[indice_jugador].get_cantidad_dados() == 0:
+            self._jugadores.pop(indice_jugador)
