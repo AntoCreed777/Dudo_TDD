@@ -12,7 +12,7 @@ class TestJugador:
     @pytest.fixture
     def jugador(self):
         """Fixture que retorna un Jugador."""
-        return Jugador()
+        return Jugador("Antonio")
 
     def test_agitar_cacho(self, capsys, jugador):
         """Verifica que se agite el cacho correctamente."""
