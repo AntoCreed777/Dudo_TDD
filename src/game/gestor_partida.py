@@ -4,6 +4,7 @@ from enum import Enum
 
 from src.game.dado import Dado, NombreDado
 from src.game.jugador import Jugador
+from src.game.validador_apuesta import ValidadorApuesta
 
 
 class DireccionJuego(Enum):
@@ -152,14 +153,44 @@ class GestorPartida:
             if not self._apuesta_actual.startswith("subir"):
                 raise ValueError("No hay apuesta válida para calzar")
 
-            from src.game.validador_apuesta import ValidadorApuesta
-
             validador = ValidadorApuesta()
             dados_maximos = 5 * len(self._jugadores)
             dados_en_juego = sum(j.get_cantidad_dados() for j in self._jugadores)
             dados_del_jugador = self._jugadores[self._turno_actual].get_cantidad_dados()
             if not validador.puede_calzar(dados_en_juego, dados_maximos, dados_del_jugador):
                 raise ValueError("No se cumplen las condiciones para calzar")
+
+        conteo = {
+            str(NombreDado.AS).lower(): 0,
+            str(NombreDado.TONTO).lower(): 0,
+            str(NombreDado.TREN).lower(): 0,
+            str(NombreDado.CUADRA).lower(): 0,
+            str(NombreDado.QUINA).lower(): 0,
+            str(NombreDado.SEXTO).lower(): 0,
+        }
+        for jugador in self._jugadores:
+            dados_jugador = jugador.ver_cacho()
+            if dados_jugador is None:
+                raise ValueError("Error en dados de jugador")
+            for nombre in dados_jugador:
+                conteo[nombre.lower()] += 1
+        prev = self._apuesta_actual.split(" ")
+
+        if prev[0] != "subir":
+            raise ValueError("No hay apuesta válida para calzar")
+        cantidad_objetivo = int(prev[1])
+        pinta_objetivo = prev[2]
+        cantidad = conteo[str(NombreDado.AS).lower()]
+
+        if pinta_objetivo != str(NombreDado.AS).lower():
+            cantidad += conteo[pinta_objetivo]
+        self._apuesta_anterior = self._apuesta_actual
+        self._apuesta_actual = apuesta
+
+        if cantidad == cantidad_objetivo:
+            self._jugadores[self._turno_actual]._dados_en_posecion += 1
+            return True
+        return False
 
     def calcular_turno(self, direccion_derecha: bool):
         """Calcula el turno del jugador actual."""
