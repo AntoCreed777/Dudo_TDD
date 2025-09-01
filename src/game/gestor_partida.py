@@ -315,4 +315,9 @@ class GestorPartida:
                 return base if observador._nombre in self._ver_propios else None
             return None
 
-        raise NotImplementedError("Modo 'abierta' no implementado")
+        if modo == "abierta":
+            if observador._nombre == objetivo._nombre:
+                return None
+            return base if observador._nombre in self._ver_ajenos else None
+
+        raise ValueError("Modo especial desconocido")
