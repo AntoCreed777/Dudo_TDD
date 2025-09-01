@@ -94,11 +94,11 @@ class Jugador:
                 )
             return (f"{Apuesta.SUBIR} " + apuesta).strip()
         elif apuesta == "2":
-            return Apuesta.PASAR
+            return str(Apuesta.PASAR)
         elif apuesta == "3":
-            return Apuesta.DUDAR
+            return str(Apuesta.DUDAR)
         else:
-            return Apuesta.CALZAR
+            return str(Apuesta.CALZAR)
 
     def get_cantidad_dados(self) -> int:
         """Retorna la cantidad de dados en posecion."""
