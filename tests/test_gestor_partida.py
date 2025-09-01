@@ -291,3 +291,25 @@ class TestGestorPartida:
                 if obs is obj:
                     continue
                 assert gestor.ver_cacho_para(obs, obj) is None
+
+    def test_visibilidad_abierta(self, gestor_4_jugadores):
+        """En 'abierta': nadie ve su propio cacho; todos ven los ajenos."""
+        gestor = gestor_4_jugadores
+        for j in gestor._jugadores:
+            j.agitar_cacho()
+            j._cacho.mostrar()
+
+        gestor._ronda_especial = True
+        gestor._pinta_fijada_especial = "tren"
+        gestor._obligador_nombre = gestor._jugadores[0]._nombre
+        gestor._modo_especial = "abierta"
+        gestor._ver_propios = set()
+        gestor._ver_ajenos = {j._nombre for j in gestor._jugadores}
+
+        for x in gestor._jugadores:
+            assert gestor.ver_cacho_para(x, x) is None
+        for obs in gestor._jugadores:
+            for obj in gestor._jugadores:
+                if obs is obj:
+                    continue
+                assert gestor.ver_cacho_para(obs, obj) is not None
