@@ -166,6 +166,8 @@ class GestorPartida:
                 if cantidad_pinta_apuesta >= int(apuesta_tokenizada[1]):
                     self._jugadores[self._turno_actual].perder_dado()
                     self._ronda_especial = False
+                    self._pinta_fijada_especial = None
+                    self._obligador_nombre = None
                     return False
                 else:
                     if self._direccion_juego is None:
@@ -175,6 +177,8 @@ class GestorPartida:
                         self.calcular_turno(not self._direccion_juego.value["bool"])
                     ].perder_dado()
                     self._ronda_especial = False
+                    self._pinta_fijada_especial = None
+                    self._obligador_nombre = None
                     return True
         if apuesta == "calzar":
             if not self._apuesta_actual.startswith("subir"):
@@ -221,9 +225,13 @@ class GestorPartida:
         if cantidad == cantidad_objetivo:
             self._jugadores[self._turno_actual]._dados_en_posecion += 1
             self._ronda_especial = False
+            self._pinta_fijada_especial = None
+            self._obligador_nombre = None
             return True
         self._jugadores[self._turno_actual].perder_dado()
         self._ronda_especial = False
+        self._pinta_fijada_especial = None
+        self._obligador_nombre = None
         return False
 
     def calcular_turno(self, direccion_derecha: bool):
@@ -266,12 +274,14 @@ class GestorPartida:
                 if not hasattr(self, "_obligar_usado"):
                     self._obligar_usado = {}
                 self._obligar_usado[obligador._nombre] = True
+                self._obligador_nombre = obligador._nombre
 
         while True:
             apuesta = self.solicitar_apuesta_a_jugador()
 
             if apuesta.startswith("subir"):
                 self.procesar_apuesta(apuesta)
+                self._turno_actual = self.calcular_turno(self._direccion_juego.value["bool"])
                 continue
 
             if apuesta == "dudar":
