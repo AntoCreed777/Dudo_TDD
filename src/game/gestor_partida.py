@@ -229,9 +229,11 @@ class GestorPartida:
                     break
 
             if obligador:
-                eleccion = input(f"{obligador._nombre}, (5) obligar cerrada: ")
-                if eleccion != "5":
-                    raise NotImplementedError("Obligar abierta aún no implementada")
+                eleccion = input(
+                    f"{obligador._nombre}, (5) obligar cerrada: / (6) obligar abierta: "
+                )
+                if eleccion not in ("5", "6"):
+                    raise ValueError("Opción de obligar inválida")
                 self._ronda_especial = True
                 if not hasattr(self, "_obligar_usado"):
                     self._obligar_usado = {}
