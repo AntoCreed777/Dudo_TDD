@@ -26,6 +26,17 @@ class NombreDado(Enum):
         }
         return nombres[self]
 
+    def a_enum(pinta: str) -> int:
+        traduccion = {
+            str(NombreDado.AS).lower(): NombreDado.AS,
+            str(NombreDado.TONTO).lower(): NombreDado.TONTO,
+            str(NombreDado.TREN).lower(): NombreDado.TREN,
+            str(NombreDado.CUADRA).lower(): NombreDado.CUADRA,
+            str(NombreDado.QUINA).lower(): NombreDado.QUINA,
+            str(NombreDado.SEXTO).lower(): NombreDado.SEXTO,
+        }
+        return traduccion[pinta]
+
 
 class Dado:
     """Clase que representa un dado en el juego Dudo."""

@@ -64,30 +64,31 @@ class Jugador:
         hay_apuesta_anterior: bool = apuesta_anterior != ""
         hay_apuesta_actual: bool = apuesta_actual != ""
         indicaciones = "\n"
-        numeros_validos = ["1", "2", "3", "4"]
+        numeros_validos = ["1"]
 
         if hay_apuesta_anterior:
-            indicaciones += f"Apuesta anterior: {apuesta_anterior}\nApuesta actual: "
-            "{apuesta_actual}\n"
+            indicaciones += (
+                f"Apuesta anterior: {apuesta_anterior}\nApuesta actual: {apuesta_actual}\n"
+            )
         elif hay_apuesta_actual:
             indicaciones += f"Apuesta actual: {apuesta_actual}\n"
 
-        indicaciones += f"{self._nombre}, Ingrese el número correspondiente a la apuesta"
-        "que quiere realizar:\n1: Subir\n2: Pasar\n3: Dudar\n4: Calzar\n\nR: "
+        indicaciones += f"{self._nombre}, Ingrese el número correspondiente a la apuesta que quiere realizar:\n1: Subir\n"
+        if hay_apuesta_actual:
+            if apuesta_actual != "pasar":
+                indicaciones += "2: Pasar\n"
+                numeros_validos.append("2")
 
-        # indicaciones += f"{self._nombre}, Ingrese el número correspondiente a la apuesta"
-        # " que quiere realizar:\n"
-        # "1: Subir\n"
-        # if apuesta_actual != "pasar":
-        #     indicaciones += "2: Pasar\n"
-        # if hay_apuesta_actual:
-        #     indicaciones += "3: Dudar\n"
-        # if hay_apuesta_actual and apuesta_actual != "pasar" or hay_apuesta_anterior:
-        #     indicaciones += "4: Calzar\n"
+            indicaciones += "3: Dudar\n"
+            numeros_validos.append("3")
+            indicaciones += "4: Calzar\n"
+            numeros_validos.append("4")
 
-        # indicaciones += "\nR: "
-        apuesta = None
+        indicaciones += "\nR: "
+
+        apuesta = input(indicaciones)
         while apuesta not in numeros_validos:
+            print("\nLa jugada ingresada no es valida, ingrese una nueva jugada.")
             apuesta = input(indicaciones)
 
         if apuesta == TipoApuesta.SUBIR.value:
@@ -100,9 +101,9 @@ class Jugador:
             ):
                 apuesta = input(
                     "\nIngrese la cantidad de dados seguido de la pinta a estimar "
-                    "separados por un espacio (Ej: 5 tren):\nR: "
+                    "separados por un espacio (Ej: 5 tren):\n\nR: "
                 )
-            return (f"{TipoApuesta.SUBIR} " + apuesta).strip()
+            return f"{TipoApuesta.SUBIR} " + apuesta
         elif apuesta == TipoApuesta.PASAR.value:
             return str(TipoApuesta.PASAR)
         elif apuesta == TipoApuesta.DUDAR.value:
@@ -117,3 +118,7 @@ class Jugador:
     def perder_dado(self):
         """Resta un dado al jugador."""
         self._dados_en_posecion -= 1
+
+    def ganar_dado(self):
+        """Suma un dado al jugador"""
+        self._dados_en_posecion += 1

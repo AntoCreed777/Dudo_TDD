@@ -3,7 +3,6 @@
 import pytest
 
 from src.game.dado import NombreDado
-from src.game.jugador import TipoApuesta
 from src.game.validador_apuesta import Apuesta, ValidadorApuesta
 
 
@@ -18,32 +17,32 @@ class TestValidadorApuesta:
 
     def test_subir_por_cantidad_o_pinta_superior(self, validador):
         """Verifica la regla de subir por cantidad o pinta superior."""
-        base = Apuesta(str(TipoApuesta.SUBIR), 2, NombreDado.TREN)
-        assert validador.es_valida(base, Apuesta(str(TipoApuesta.SUBIR), 3, NombreDado.TREN))
-        assert validador.es_valida(base, Apuesta(str(TipoApuesta.SUBIR), 2, NombreDado.CUADRA))
-        assert not validador.es_valida(base, Apuesta(str(TipoApuesta.SUBIR), 2, NombreDado.TONTO))
-        assert not validador.es_valida(base, Apuesta(str(TipoApuesta.SUBIR), 2, NombreDado.TREN))
-        assert not validador.es_valida(base, Apuesta(str(TipoApuesta.SUBIR), 1, NombreDado.CUADRA))
+        base = Apuesta(2, NombreDado.TREN)
+        assert validador.puede_subir(base, Apuesta(3, NombreDado.TREN))
+        assert validador.puede_subir(base, Apuesta(2, NombreDado.CUADRA))
+        assert not validador.puede_subir(base, Apuesta(2, NombreDado.TONTO))
+        assert not validador.puede_subir(base, Apuesta(2, NombreDado.TREN))
+        assert not validador.puede_subir(base, Apuesta(1, NombreDado.CUADRA))
 
     def test_regla_cambiar_a_ases(self, validador):
         """Verifica la regla de cambiar a ases."""
-        base = Apuesta(str(TipoApuesta.SUBIR), 7, NombreDado.TREN)
-        assert validador.es_valida(base, Apuesta(str(TipoApuesta.SUBIR), 4, NombreDado.AS))
-        base = Apuesta(str(TipoApuesta.SUBIR), 8, NombreDado.TREN)
-        assert validador.es_valida(base, Apuesta(str(TipoApuesta.SUBIR), 5, NombreDado.AS))
-        assert not validador.es_valida(
-            Apuesta(str(TipoApuesta.SUBIR), 7, NombreDado.QUINA),
-            Apuesta(str(TipoApuesta.SUBIR), 3, NombreDado.AS),
+        base = Apuesta(7, NombreDado.TREN)
+        assert validador.puede_subir(base, Apuesta(4, NombreDado.AS))
+        base = Apuesta(8, NombreDado.TREN)
+        assert validador.puede_subir(base, Apuesta(5, NombreDado.AS))
+        assert not validador.puede_subir(
+            Apuesta(7, NombreDado.QUINA),
+            Apuesta(3, NombreDado.AS),
         )
 
     def test_regla_desde_ases(self, validador):
         """Verifica la regla de bajar desde ases."""
-        base = Apuesta(str(TipoApuesta.SUBIR), 2, NombreDado.AS)
-        assert validador.es_valida(base, Apuesta(str(TipoApuesta.SUBIR), 5, NombreDado.TREN))
-        assert not validador.es_valida(base, Apuesta(str(TipoApuesta.SUBIR), 4, NombreDado.TREN))
-        base = Apuesta(str(TipoApuesta.SUBIR), 4, NombreDado.AS)
-        assert validador.es_valida(base, Apuesta(str(TipoApuesta.SUBIR), 9, NombreDado.SEXTO))
-        assert not validador.es_valida(base, Apuesta(str(TipoApuesta.SUBIR), 8, NombreDado.SEXTO))
+        base = Apuesta(2, NombreDado.AS)
+        assert validador.puede_subir(base, Apuesta(5, NombreDado.TREN))
+        assert not validador.puede_subir(base, Apuesta(4, NombreDado.TREN))
+        base = Apuesta(4, NombreDado.AS)
+        assert validador.puede_subir(base, Apuesta(9, NombreDado.SEXTO))
+        assert not validador.puede_subir(base, Apuesta(8, NombreDado.SEXTO))
 
     def test_puede_partir_con_ases_solo_primera_vez_por_jugador(self, validador):
         """Verifica la regla de partir con ases solo la primera vez por jugador."""
