@@ -1,6 +1,6 @@
 """Módulo que contiene la clase GestorPartida para gestionar la lógica de la partida de Dudo."""
 
-from src.game.dado import Dado, NombreDado
+from src.game.dado import Dado
 from src.game.jugador import Jugador
 
 
