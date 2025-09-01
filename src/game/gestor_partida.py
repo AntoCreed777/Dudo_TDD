@@ -367,3 +367,10 @@ class GestorPartida:
             return base if observador._nombre in self._ver_ajenos else None
 
         raise ValueError("Modo especial desconocido")
+
+    def dados_en_juego(self):
+        total = 0
+        for jugador in self._jugadores:
+            total += jugador._dados_en_posecion
+
+        return total
