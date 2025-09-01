@@ -3,7 +3,7 @@
 from enum import Enum
 
 from src.game.dado import Dado, NombreDado
-from src.game.jugador import Jugador
+from src.game.jugador import Jugador, TipoApuesta
 from src.game.validador_apuesta import ValidadorApuesta
 
 
@@ -16,6 +16,14 @@ class DireccionJuego(Enum):
         return direcciones[self]
 
 
+class TipoRondaEspecial(Enum):
+    Abierta = "Abierta"
+    Cerrada = "Cerrada"
+
+    def __str__(self):
+        return self.value
+
+
 class GestorPartida:
     """Clase que gestiona la partida, jugadores y turnos."""
 
@@ -25,6 +33,13 @@ class GestorPartida:
     _apuesta_anterior: str
     _apuesta_actual: str
     _cantidad_pintas: dict[str, int]
+    _ronda_especial: bool
+    _obligar_usado: dict[str, bool]
+    _pinta_fijada_especial: str | None
+    _modo_especial: TipoRondaEspecial | None
+    _ver_propios: set
+    _ver_ajenos: set
+    _obligador_nombre: str | None
 
     def __init__(self, cantidad_jugadores):
         """Inicializa el gestor de partida con la cantidad de jugadores indicada."""
@@ -122,7 +137,7 @@ class GestorPartida:
     def procesar_apuesta(self, apuesta):
         """Procesa una apuesta durante la ronda."""
         apuesta_tokenizada = apuesta.split(" ")
-        if apuesta_tokenizada[0] == "subir":
+        if apuesta_tokenizada[0] == str(TipoApuesta.SUBIR):
             if self._ronda_especial and self._pinta_fijada_especial:
                 pinta_nueva = apuesta_tokenizada[2]
                 if pinta_nueva != self._pinta_fijada_especial:
@@ -130,13 +145,15 @@ class GestorPartida:
                     cant_nueva = int(apuesta_tokenizada[1])
 
                     cant_anterior = None
-                    if self._apuesta_actual and self._apuesta_actual.startswith("subir"):
+                    if self._apuesta_actual and self._apuesta_actual.startswith(
+                        str(TipoApuesta.SUBIR)
+                    ):
                         prev = self._apuesta_actual.split(" ")
                         cant_anterior = int(prev[1])
 
                     puede_cambiar = (
                         jugador.get_cantidad_dados() == 1
-                        and getattr(self, "_obligador_nombre", None) is not None
+                        and self._obligador_nombre is not None
                         and jugador._nombre != self._obligador_nombre
                         and cant_anterior is not None
                         and cant_nueva > cant_anterior
@@ -148,7 +165,8 @@ class GestorPartida:
             self._apuesta_anterior = self._apuesta_actual
             self._apuesta_actual = apuesta
             return False
-        if apuesta == "dudar":
+
+        if apuesta == str(TipoApuesta.DUDAR):
             for jugador in self._jugadores:
                 dados_jugador = jugador.ver_cacho()
 
@@ -163,7 +181,7 @@ class GestorPartida:
             self._apuesta_anterior = self._apuesta_actual
             self._apuesta_actual = apuesta
 
-            if apuesta_tokenizada[0] == "subir":
+            if apuesta_tokenizada[0] == str(TipoApuesta.SUBIR):
                 cantidad_pinta_apuesta += self._cantidad_pintas[str(NombreDado.AS).lower()]
                 if apuesta_tokenizada[2] != str(NombreDado.AS).lower():
                     cantidad_pinta_apuesta += self._cantidad_pintas[apuesta_tokenizada[2]]
@@ -190,8 +208,8 @@ class GestorPartida:
                     self._ver_propios.clear()
                     self._ver_ajenos.clear()
                     return True
-        if apuesta == "calzar":
-            if not self._apuesta_actual.startswith("subir"):
+        if apuesta == str(TipoApuesta.CALZAR):
+            if not self._apuesta_actual.startswith(str(TipoApuesta.SUBIR)):
                 raise ValueError("No hay apuesta válida para calzar")
 
             validador = ValidadorApuesta()
@@ -217,7 +235,7 @@ class GestorPartida:
                 conteo[nombre.lower()] += 1
         prev = self._apuesta_actual.split(" ")
 
-        if prev[0] != "subir":
+        if prev[0] != str(TipoApuesta.SUBIR):
             raise ValueError("No hay apuesta válida para calzar")
         cantidad_objetivo = int(prev[1])
         pinta_objetivo = prev[2]
@@ -293,11 +311,11 @@ class GestorPartida:
                 self._obligador_nombre = obligador._nombre
 
                 if eleccion == "5":
-                    self._modo_especial = "cerrada"
+                    self._modo_especial = TipoRondaEspecial.Cerrada
                     self._ver_propios = {obligador._nombre}
                     self._ver_ajenos = set()
                 else:
-                    self._modo_especial = "abierta"
+                    self._modo_especial = TipoRondaEspecial.Abierta
                     self._ver_propios = set()
                     self._ver_ajenos = {j._nombre for j in self._jugadores}
 
@@ -331,12 +349,12 @@ class GestorPartida:
         if modo is None:
             return base
 
-        if modo == "cerrada":
+        if modo == TipoRondaEspecial.Cerrada:
             if observador._nombre == objetivo._nombre:
                 return base if observador._nombre in self._ver_propios else None
             return None
 
-        if modo == "abierta":
+        if modo == TipoRondaEspecial.Abierta:
             if observador._nombre == objetivo._nombre:
                 return None
             return base if observador._nombre in self._ver_ajenos else None

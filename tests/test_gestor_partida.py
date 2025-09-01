@@ -2,7 +2,8 @@
 
 import pytest
 
-from src.game.gestor_partida import DireccionJuego, GestorPartida
+from src.game.dado import NombreDado
+from src.game.gestor_partida import DireccionJuego, GestorPartida, TipoApuesta, TipoRondaEspecial
 
 
 @pytest.fixture(scope="function")
@@ -46,14 +47,20 @@ class TestGestorPartida:
 
     def test_solicitar_apuesta(self, mocker, gestor_4_jugadores):
         """Verifica que se puedan solicitar apuestas al siguiente Jugador."""
-        mocker.patch("builtins.input", side_effect=["1", "3 cuadra"])
-        assert gestor_4_jugadores.solicitar_apuesta_a_jugador() == "subir 3 cuadra"
-        mocker.patch("builtins.input", return_value="2")
-        assert gestor_4_jugadores.solicitar_apuesta_a_jugador() == "pasar"
-        mocker.patch("builtins.input", return_value="3")
-        assert gestor_4_jugadores.solicitar_apuesta_a_jugador() == "dudar"
-        mocker.patch("builtins.input", return_value="4")
-        assert gestor_4_jugadores.solicitar_apuesta_a_jugador() == "calzar"
+        mocker.patch(
+            "builtins.input",
+            side_effect=[TipoApuesta.SUBIR.value, f"3 {str(NombreDado.CUADRA).lower()}"],
+        )
+        assert (
+            gestor_4_jugadores.solicitar_apuesta_a_jugador()
+            == f"{str(TipoApuesta.SUBIR)} 3 {str(NombreDado.CUADRA).lower()}"
+        )
+        mocker.patch("builtins.input", return_value=TipoApuesta.PASAR.value)
+        assert gestor_4_jugadores.solicitar_apuesta_a_jugador() == str(TipoApuesta.PASAR)
+        mocker.patch("builtins.input", return_value=TipoApuesta.DUDAR.value)
+        assert gestor_4_jugadores.solicitar_apuesta_a_jugador() == str(TipoApuesta.DUDAR)
+        mocker.patch("builtins.input", return_value=TipoApuesta.CALZAR.value)
+        assert gestor_4_jugadores.solicitar_apuesta_a_jugador() == str(TipoApuesta.CALZAR)
 
     def test_eliminar_jugador(self, gestor_4_jugadores):
         """Verifica que se elimine un jugador cuando se queda sin dados."""
@@ -65,11 +72,17 @@ class TestGestorPartida:
 
     def test_subir_apuesta(self, mocker, gestor_4_jugadores):
         """Test que verifica que el movimiento de subir apuesta funcione correctamente"""
-        mocker.patch("builtins.input", side_effect=["1", "3 quina"])
+        mocker.patch(
+            "builtins.input",
+            side_effect=[TipoApuesta.SUBIR.value, f"3 {str(NombreDado.QUINA).lower()}"],
+        )
         gestor_4_jugadores._turno_actual = 0
         apuesta = gestor_4_jugadores.solicitar_apuesta_a_jugador()
         gestor_4_jugadores.procesar_apuesta(apuesta)
-        assert gestor_4_jugadores._apuesta_actual == "subir 3 quina"
+        assert (
+            gestor_4_jugadores._apuesta_actual
+            == f"{str(TipoApuesta.SUBIR)} 3 {str(NombreDado.QUINA).lower()}"
+        )
 
     @pytest.mark.parametrize(
         "dado1,dado2,resultado,dados_jugador", [(3, 3, True, 4), (3, 2, False, 5), (2, 2, False, 5)]
@@ -80,23 +93,31 @@ class TestGestorPartida:
         """Test para probar los casos de haber dudado exitosamente o incorrectamente"""
         gestor_4_jugadores._direccion_juego = DireccionJuego.Derecha
         gestor_4_jugadores._turno_actual = 1
-        gestor_4_jugadores._apuesta_actual = "subir 4 tonto"
+        gestor_4_jugadores._apuesta_actual = (
+            f"{str(TipoApuesta.SUBIR)} 4 {str(NombreDado.TONTO).lower()}"
+        )
         mocker.patch(
             "src.game.dado.random.randint",
             side_effect=[3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 2, 2, 2, dado1, dado2],
         )
         for jugador in gestor_4_jugadores._jugadores:
             jugador.agitar_cacho()
-        resultado_dudar = gestor_4_jugadores.procesar_apuesta("dudar")
-        assert gestor_4_jugadores._apuesta_anterior == "subir 4 tonto"
-        assert gestor_4_jugadores._apuesta_actual == "dudar"
+        resultado_dudar = gestor_4_jugadores.procesar_apuesta(str(TipoApuesta.DUDAR))
+        assert (
+            gestor_4_jugadores._apuesta_anterior
+            == f"{str(TipoApuesta.SUBIR)} 4 {str(NombreDado.TONTO).lower()}"
+        )
+        assert gestor_4_jugadores._apuesta_actual == str(TipoApuesta.DUDAR)
         assert resultado_dudar == resultado
         assert gestor_4_jugadores._jugadores[0]._dados_en_posecion == dados_jugador
 
     @pytest.mark.skip(reason="Test aun no implementado")
     def test_jugar_ronda(self, mocker, gestor_4_jugadores):
         """Test pendiente para jugar una ronda."""
-        mocker.patch("builtins.input", side_effect=["1", "3 cuadra"])
+        mocker.patch(
+            "builtins.input",
+            side_effect=[TipoApuesta.SUBIR.value, f"3 {str(NombreDado.CUADRA).lower()}"],
+        )
         pass
 
     @pytest.mark.skip(reason="Test aun no implementado")
@@ -108,7 +129,7 @@ class TestGestorPartida:
         """Si no se cumplen las condiciones para calzar, se lanza ValueError."""
         gestor = gestor_4_jugadores
         gestor._turno_actual = 2
-        gestor._apuesta_actual = "subir 3 as"
+        gestor._apuesta_actual = f"{str(TipoApuesta.SUBIR)} 3 {str(NombreDado.AS).lower()}"
         gestor._jugadores[0]._dados_en_posecion = 2
         gestor._jugadores[1]._dados_en_posecion = 2
         gestor._jugadores[2]._dados_en_posecion = 3
@@ -119,20 +140,20 @@ class TestGestorPartida:
         for j in gestor._jugadores:
             j.agitar_cacho()
         with pytest.raises(ValueError, match="No se cumplen las condiciones para calzar"):
-            gestor.procesar_apuesta("calzar")
+            gestor.procesar_apuesta(str(TipoApuesta.CALZAR))
 
     def test_calzar_exacto_gana_un_dado(self, mocker, gestor_4_jugadores):
         """Si el conteo coincide exactamente con la apuesta, el calzador gana 1 dado."""
         gestor = gestor_4_jugadores
         gestor._turno_actual = 0
-        gestor._apuesta_actual = "subir 6 tren"
+        gestor._apuesta_actual = f"{str(TipoApuesta.SUBIR)} 6 {str(NombreDado.TREN).lower()}"
 
         side_effect = [3, 1, 6, 6, 6, 3, 3, 6, 6, 6, 1, 6, 6, 6, 6, 3, 6, 6, 6, 6]
         mocker.patch("src.game.dado.random.randint", side_effect=side_effect)
         for j in gestor._jugadores:
             j.agitar_cacho()
         antes = gestor._jugadores[0].get_cantidad_dados()
-        resultado = gestor.procesar_apuesta("calzar")
+        resultado = gestor.procesar_apuesta(str(TipoApuesta.CALZAR))
         despues = gestor._jugadores[0].get_cantidad_dados()
         assert resultado is True
         assert despues == antes + 1
@@ -141,14 +162,14 @@ class TestGestorPartida:
         """Si el conteo no coincide exactamente, el calzador pierde 1 dado."""
         gestor = gestor_4_jugadores
         gestor._turno_actual = 1
-        gestor._apuesta_actual = "subir 5 tonto"
+        gestor._apuesta_actual = f"{str(TipoApuesta.SUBIR)} 5 {str(NombreDado.TONTO).lower()}"
 
         side_effect = [1, 3, 4, 5, 6, 2, 2, 1, 6, 6, 1, 1, 4, 5, 6, 1, 1, 4, 5, 6]
         mocker.patch("src.game.dado.random.randint", side_effect=side_effect)
         for j in gestor._jugadores:
             j.agitar_cacho()
         antes = gestor._jugadores[1].get_cantidad_dados()
-        resultado = gestor.procesar_apuesta("calzar")
+        resultado = gestor.procesar_apuesta(str(TipoApuesta.CALZAR))
         despues = gestor._jugadores[1].get_cantidad_dados()
         assert resultado is False
         assert despues == antes - 1
@@ -158,18 +179,18 @@ class TestGestorPartida:
         gestor = gestor_4_jugadores
         gestor._direccion_juego = DireccionJuego.Derecha
         gestor._turno_actual = 0
-        gestor._apuesta_actual = "subir 6 tren"
+        gestor._apuesta_actual = f"{str(TipoApuesta.SUBIR)} 6 {str(NombreDado.TREN).lower()}"
 
         mocker.patch(
             "src.game.dado.random.randint",
             side_effect=[3, 1, 6, 6, 6, 3, 3, 6, 6, 6, 1, 6, 6, 6, 6, 3, 6, 6, 6, 6],
         )
-        mocker.patch("builtins.input", side_effect=["1", "6 tren", "4"])
+        mocker.patch("builtins.input", side_effect=["1", f"6 {str(NombreDado.TREN).lower()}", "4"])
         for j in gestor._jugadores:
             j.agitar_cacho()
 
         resultado = gestor.jugar_ronda()
-        assert resultado["accion"] == "calzar"
+        assert resultado["accion"] == str(TipoApuesta.CALZAR)
         assert resultado["termino"] is True
         assert resultado["resultado"] is True
 
@@ -178,18 +199,18 @@ class TestGestorPartida:
         gestor = gestor_4_jugadores
         gestor._direccion_juego = DireccionJuego.Derecha
         gestor._turno_actual = 1
-        gestor._apuesta_actual = "subir 4 tonto"
+        gestor._apuesta_actual = f"{str(TipoApuesta.SUBIR)} 4 {str(NombreDado.TONTO).lower()}"
 
         mocker.patch(
             "src.game.dado.random.randint",
             side_effect=[1, 3, 4, 5, 6, 2, 2, 1, 6, 6, 1, 1, 4, 5, 6, 1, 1, 4, 5, 6],
         )
-        mocker.patch("builtins.input", side_effect=["1", "4 tonto", "3"])
+        mocker.patch("builtins.input", side_effect=["1", f"4 {str(NombreDado.TONTO).lower()}", "3"])
         for j in gestor._jugadores:
             j.agitar_cacho()
 
         resultado = gestor.jugar_ronda()
-        assert resultado["accion"] == "dudar"
+        assert resultado["accion"] == str(TipoApuesta.DUDAR)
         assert resultado["termino"] is True
 
     def test_jugar_ronda_especial_termina_con_dudar_y_obligar_cerrada(
@@ -200,18 +221,18 @@ class TestGestorPartida:
         gestor._direccion_juego = DireccionJuego.Derecha
         gestor._turno_actual = 1
         gestor._jugadores[1]._dados_en_posecion = 1
-        gestor._apuesta_actual = "subir 4 tonto"
+        gestor._apuesta_actual = f"{str(TipoApuesta.SUBIR)} 4 {str(NombreDado.TONTO).lower()}"
 
         mocker.patch(
             "src.game.dado.random.randint",
             side_effect=[1, 2, 2, 6, 6, 1, 2, 1, 6, 6, 6, 1, 6, 6, 6, 6],
         )
-        mocker.patch("builtins.input", side_effect=["5", "tren", "3"])
+        mocker.patch("builtins.input", side_effect=["5", str(NombreDado.TREN).lower(), "3"])
         for j in gestor._jugadores:
             j.agitar_cacho()
 
         resultado = gestor.jugar_ronda()
-        assert resultado["accion"] == "dudar"
+        assert resultado["accion"] == str(TipoApuesta.DUDAR)
         assert resultado["termino"] is True
         assert isinstance(resultado["resultado"], bool)
 
@@ -223,18 +244,18 @@ class TestGestorPartida:
         gestor._direccion_juego = DireccionJuego.Derecha
         gestor._turno_actual = 0
         gestor._jugadores[0]._dados_en_posecion = 1
-        gestor._apuesta_actual = "subir 3 tren"
+        gestor._apuesta_actual = f"{str(TipoApuesta.SUBIR)} 3 {str(NombreDado.TREN).lower()}"
 
         mocker.patch(
             "src.game.dado.random.randint",
             side_effect=[3, 3, 6, 6, 6, 6, 1, 6, 6, 6, 6, 3, 6, 6, 6, 6],
         )
-        mocker.patch("builtins.input", side_effect=["6", "tren", "4"])
+        mocker.patch("builtins.input", side_effect=["6", str(NombreDado.TREN).lower(), "4"])
         for j in gestor._jugadores:
             j.agitar_cacho()
 
         resultado = gestor.jugar_ronda()
-        assert resultado["accion"] == "calzar"
+        assert resultado["accion"] == str(TipoApuesta.CALZAR)
         assert resultado["termino"] is True
         assert resultado["resultado"] in (True, False)
 
@@ -242,7 +263,15 @@ class TestGestorPartida:
         gestor = gestor_4_jugadores
         gestor._direccion_juego = DireccionJuego.Derecha
         gestor._jugadores[0]._dados_en_posecion = 1
-        mocker.patch("builtins.input", side_effect=["5", "tren", "1", "3 tonto"])
+        mocker.patch(
+            "builtins.input",
+            side_effect=[
+                "5",
+                str(NombreDado.TREN).lower(),
+                "1",
+                f"3 {str(NombreDado.TONTO).lower()}",
+            ],
+        )
         mocker.patch("src.game.dado.random.randint", side_effect=[3, 3, 3, 3, 3] * 4)
         for j in gestor._jugadores:
             j.agitar_cacho()
@@ -259,7 +288,16 @@ class TestGestorPartida:
         gestor._jugadores[2]._dados_en_posecion = 1
         gestor._turno_actual = 1
         mocker.patch(
-            "builtins.input", side_effect=["5", "tren", "1", "2 tren", "1", "3 tonto", "4"]
+            "builtins.input",
+            side_effect=[
+                "5",
+                str(NombreDado.TREN).lower(),
+                "1",
+                f"2 {str(NombreDado.TREN).lower()}",
+                "1",
+                f"3 {str(NombreDado.TONTO).lower()}",
+                "4",
+            ],
         )
         mocker.patch("src.game.dado.random.randint", side_effect=[3] * 20)
         for j in gestor._jugadores:
@@ -277,9 +315,9 @@ class TestGestorPartida:
 
         obligador = gestor._jugadores[0]
         gestor._ronda_especial = True
-        gestor._pinta_fijada_especial = "tren"
+        gestor._pinta_fijada_especial = str(NombreDado.TREN).lower()
         gestor._obligador_nombre = obligador._nombre
-        gestor._modo_especial = "cerrada"
+        gestor._modo_especial = TipoRondaEspecial.Cerrada
         gestor._ver_propios = {obligador._nombre}
         gestor._ver_ajenos = set()
 
@@ -300,9 +338,9 @@ class TestGestorPartida:
             j._cacho.mostrar()
 
         gestor._ronda_especial = True
-        gestor._pinta_fijada_especial = "tren"
+        gestor._pinta_fijada_especial = str(NombreDado.TREN).lower()
         gestor._obligador_nombre = gestor._jugadores[0]._nombre
-        gestor._modo_especial = "abierta"
+        gestor._modo_especial = TipoRondaEspecial.Abierta
         gestor._ver_propios = set()
         gestor._ver_ajenos = {j._nombre for j in gestor._jugadores}
 
@@ -320,20 +358,20 @@ class TestGestorPartida:
         gestor._direccion_juego = DireccionJuego.Derecha
         gestor._turno_actual = 0
         gestor._jugadores[0]._dados_en_posecion = 1
-        gestor._apuesta_actual = "subir 2 tren"
+        gestor._apuesta_actual = f"{str(TipoApuesta.SUBIR)} 2 {str(NombreDado.TREN).lower()}"
 
         mocker.patch("src.game.dado.random.randint", side_effect=[3, 3, 3, 3, 3] * 4)
         for j in gestor._jugadores:
             j.agitar_cacho()
 
-        mocker.patch("builtins.input", side_effect=["5", "tren"])
+        mocker.patch("builtins.input", side_effect=["5", str(NombreDado.TREN).lower()])
         with pytest.raises(StopIteration):
             _ = gestor.jugar_ronda()
 
         assert gestor._ronda_especial is True
-        assert gestor._pinta_fijada_especial == "tren"
+        assert gestor._pinta_fijada_especial == str(NombreDado.TREN).lower()
         assert gestor._obligador_nombre == gestor._jugadores[0]._nombre
-        assert gestor._modo_especial == "cerrada"
+        assert gestor._modo_especial == TipoRondaEspecial.Cerrada
         assert gestor._ver_propios == {gestor._jugadores[0]._nombre}
         assert gestor._ver_ajenos == set()
 
