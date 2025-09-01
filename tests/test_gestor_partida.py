@@ -206,7 +206,7 @@ class TestGestorPartida:
             "src.game.dado.random.randint",
             side_effect=[1, 2, 2, 6, 6, 1, 2, 1, 6, 6, 6, 1, 6, 6, 6, 6],
         )
-        mocker.patch("builtins.input", side_effect=["5", "3"])
+        mocker.patch("builtins.input", side_effect=["5", "tren", "3"])
         for j in gestor._jugadores:
             j.agitar_cacho()
 
@@ -229,7 +229,7 @@ class TestGestorPartida:
             "src.game.dado.random.randint",
             side_effect=[3, 3, 6, 6, 6, 6, 1, 6, 6, 6, 6, 3, 6, 6, 6, 6],
         )
-        mocker.patch("builtins.input", side_effect=["6", "4"])
+        mocker.patch("builtins.input", side_effect=["6", "tren", "4"])
         for j in gestor._jugadores:
             j.agitar_cacho()
 
@@ -237,3 +237,15 @@ class TestGestorPartida:
         assert resultado["accion"] == "calzar"
         assert resultado["termino"] is True
         assert resultado["resultado"] in (True, False)
+
+    def test_especial_no_puede_cambiar_pinta_fijada(self, mocker, gestor_4_jugadores):
+        gestor = gestor_4_jugadores
+        gestor._direccion_juego = DireccionJuego.Derecha
+        gestor._jugadores[0]._dados_en_posecion = 1
+        mocker.patch("builtins.input", side_effect=["5", "tren", "1", "3 tonto"])
+        mocker.patch("src.game.dado.random.randint", side_effect=[3, 3, 3, 3, 3] * 4)
+        for j in gestor._jugadores:
+            j.agitar_cacho()
+
+        with pytest.raises(ValueError, match="Pinta fija en ronda especial"):
+            gestor.jugar_ronda()
