@@ -1,17 +1,26 @@
 """Módulo que contiene la clase Jugador para el juego Dudo."""
 
-from src.game.cacho import Cacho
-from src.game.dado import NombreDado
 from enum import Enum
 
+from src.game.cacho import Cacho
+from src.game.dado import NombreDado
+
+
 class Apuesta(Enum):
-    SUBIR = "subir"
-    PASAR = "pasar"
-    DUDAR = "dudar"
-    CALZAR = "calzar"
+    SUBIR = "1"
+    PASAR = "2"
+    DUDAR = "3"
+    CALZAR = "4"
 
     def __str__(self):
-        return self.value
+        traduccion = {
+            Apuesta.SUBIR: "subir",
+            Apuesta.PASAR: "pasar",
+            Apuesta.DUDAR: "dudar",
+            Apuesta.CALZAR: "calzar",
+        }
+        return traduccion[self]
+
 
 class Jugador:
     """Clase que representa un jugador en el juego Dudo."""
@@ -20,7 +29,7 @@ class Jugador:
     _dados_en_posecion: int
 
     def __init__(self, nombre):
-        """Inicializa el jugador con un cacho y sin dados en posesión."""
+        """Inicializa el jugador con un cacho y 5 dados en posesión."""
         self._nombre = nombre
         self._cacho = Cacho()
         self._dados_en_posecion = 5
@@ -80,7 +89,7 @@ class Jugador:
         while apuesta not in numeros_validos:
             apuesta = input(indicaciones)
 
-        if apuesta == "1":
+        if apuesta == Apuesta.SUBIR.value:
             pintas = [str(pinta).lower() for pinta in NombreDado]
             apuesta = ""
             while (
@@ -93,9 +102,9 @@ class Jugador:
                     "separados por un espacio (Ej: 5 tren):\nR: "
                 )
             return (f"{Apuesta.SUBIR} " + apuesta).strip()
-        elif apuesta == "2":
+        elif apuesta == Apuesta.PASAR.value:
             return str(Apuesta.PASAR)
-        elif apuesta == "3":
+        elif apuesta == Apuesta.DUDAR.value:
             return str(Apuesta.DUDAR)
         else:
             return str(Apuesta.CALZAR)

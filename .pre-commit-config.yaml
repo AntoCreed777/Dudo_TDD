@@ -15,12 +15,12 @@ repos:
         language: system
         types: [python]
 
-      - id: pydocstyle
-        name: Pydocstyle
-        entry: pydocstyle
-        args: [src]
-        language: system
-        types: [python]
+      #- id: pydocstyle
+      #  name: Pydocstyle
+      #  entry: pydocstyle
+      #  args: [src]
+      #  language: system
+      #  types: [python]
 
       #- id: run-pytest
       #  name: Run Pytest

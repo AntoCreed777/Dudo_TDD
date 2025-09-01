@@ -20,7 +20,7 @@ class GestorPartida:
             str(NombreDado.TREN).lower(): 0,
             str(NombreDado.CUADRA).lower(): 0,
             str(NombreDado.QUINA).lower(): 0,
-            str(NombreDado.SEXTO).lower(): 0
+            str(NombreDado.SEXTO).lower(): 0,
         }
 
         for _ in range(cantidad_jugadores):
@@ -115,8 +115,9 @@ class GestorPartida:
                     self._jugadores[self._turno_actual].perder_dado()
                     return False
                 else:
-                    self._jugadores[self.calcular_turno(
-                        not self._direccion_antihoraria_juego)].perder_dado()
+                    self._jugadores[
+                        self.calcular_turno(not self._direccion_antihoraria_juego)
+                    ].perder_dado()
                     return True
 
     def calcular_turno(self, direccion_antihoraria: bool):
