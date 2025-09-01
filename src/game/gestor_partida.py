@@ -172,6 +172,9 @@ class GestorPartida:
                     self._ronda_especial = False
                     self._pinta_fijada_especial = None
                     self._obligador_nombre = None
+                    self._modo_especial = None
+                    self._ver_propios.clear()
+                    self._ver_ajenos.clear()
                     return False
                 else:
                     if self._direccion_juego is None:
@@ -183,6 +186,9 @@ class GestorPartida:
                     self._ronda_especial = False
                     self._pinta_fijada_especial = None
                     self._obligador_nombre = None
+                    self._modo_especial = None
+                    self._ver_propios.clear()
+                    self._ver_ajenos.clear()
                     return True
         if apuesta == "calzar":
             if not self._apuesta_actual.startswith("subir"):
@@ -231,11 +237,17 @@ class GestorPartida:
             self._ronda_especial = False
             self._pinta_fijada_especial = None
             self._obligador_nombre = None
+            self._modo_especial = None
+            self._ver_propios.clear()
+            self._ver_ajenos.clear()
             return True
         self._jugadores[self._turno_actual].perder_dado()
         self._ronda_especial = False
         self._pinta_fijada_especial = None
         self._obligador_nombre = None
+        self._modo_especial = None
+        self._ver_propios.clear()
+        self._ver_ajenos.clear()
         return False
 
     def calcular_turno(self, direccion_derecha: bool):
@@ -279,6 +291,15 @@ class GestorPartida:
                     self._obligar_usado = {}
                 self._obligar_usado[obligador._nombre] = True
                 self._obligador_nombre = obligador._nombre
+
+                if eleccion == "5":
+                    self._modo_especial = "cerrada"
+                    self._ver_propios = {obligador._nombre}
+                    self._ver_ajenos = set()
+                else:
+                    self._modo_especial = "abierta"
+                    self._ver_propios = set()
+                    self._ver_ajenos = {j._nombre for j in self._jugadores}
 
         while True:
             apuesta = self.solicitar_apuesta_a_jugador()
