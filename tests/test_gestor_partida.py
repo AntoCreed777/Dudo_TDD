@@ -214,3 +214,26 @@ class TestGestorPartida:
         assert resultado["accion"] == "dudar"
         assert resultado["termino"] is True
         assert isinstance(resultado["resultado"], bool)
+
+    def test_jugar_ronda_especial_termina_con_calzar_y_obligar_abierta(
+        self, mocker, gestor_4_jugadores
+    ):
+        """Ronda especial 'abierta', termina con 'calzar'."""
+        gestor = gestor_4_jugadores
+        gestor._direccion_juego = DireccionJuego.Derecha
+        gestor._turno_actual = 0
+        gestor._jugadores[0]._dados_en_posecion = 1
+        gestor._apuesta_actual = "subir 3 tren"
+
+        mocker.patch(
+            "src.game.dado.random.randint",
+            side_effect=[3, 3, 6, 6, 6, 6, 1, 6, 6, 6, 6, 3, 6, 6, 6, 6],
+        )
+        mocker.patch("builtins.input", side_effect=["6", "4"])
+        for j in gestor._jugadores:
+            j.agitar_cacho()
+
+        resultado = gestor.jugar_ronda()
+        assert resultado["accion"] == "calzar"
+        assert resultado["termino"] is True
+        assert resultado["resultado"] in (True, False)
