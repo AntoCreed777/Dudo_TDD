@@ -103,3 +103,20 @@ class TestGestorPartida:
     def test_verificar_fin_partida(self):
         """Test pendiente para verificar el fin de la partida."""
         pass
+
+    def test_calzar_no_permitido_levanta_error(self, mocker, gestor_4_jugadores):
+        """Si no se cumplen las condiciones para calzar, se lanza ValueError."""
+        gestor = gestor_4_jugadores
+        gestor._turno_actual = 2
+        gestor._apuesta_actual = "subir 3 as"
+        gestor._jugadores[0]._dados_en_posecion = 2
+        gestor._jugadores[1]._dados_en_posecion = 2
+        gestor._jugadores[2]._dados_en_posecion = 3
+        gestor._jugadores[3]._dados_en_posecion = 2
+
+        side_effect = [1, 2, 3, 4, 1, 6, 6, 5, 5]
+        mocker.patch("src.game.dado.random.randint", side_effect=side_effect)
+        for j in gestor._jugadores:
+            j.agitar_cacho()
+        with pytest.raises(ValueError, match="No se cumplen las condiciones para calzar"):
+            gestor.procesar_apuesta("calzar")
