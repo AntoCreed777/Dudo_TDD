@@ -1,7 +1,18 @@
 """Módulo que contiene la clase GestorPartida para gestionar la lógica de la partida de Dudo."""
 
+from enum import Enum
+
 from src.game.dado import Dado, NombreDado
 from src.game.jugador import Jugador
+
+
+class DireccionJuego(Enum):
+    Derecha = "1"
+    Izquierda = "-1"
+
+    def __str__(self):
+        direcciones = {DireccionJuego.Derecha: "Derecha", DireccionJuego.Izquierda: "Izquierda"}
+        return direcciones[self]
 
 
 class GestorPartida:
@@ -10,7 +21,7 @@ class GestorPartida:
     def __init__(self, cantidad_jugadores):
         """Inicializa el gestor de partida con la cantidad de jugadores indicada."""
         self._jugadores = []
-        self._direccion_antihoraria_juego = None
+        self._direccion_juego = None
         self._turno_actual = -1
         self._apuesta_anterior = ""
         self._apuesta_actual = ""
@@ -73,10 +84,10 @@ class GestorPartida:
             )
             direccion = input(mensaje)
 
-        if direccion == "1":
-            self._direccion_antihoraria_juego = True
+        if direccion == DireccionJuego.Derecha.value:
+            self._direccion_juego = DireccionJuego.Derecha
         else:
-            self._direccion_antihoraria_juego = False
+            self._direccion_juego = DireccionJuego.Izquierda
 
     def solicitar_apuesta_a_jugador(self) -> str:
         """Solicita al Jugador actual que realize su apuesta."""
@@ -116,12 +127,14 @@ class GestorPartida:
                     return False
                 else:
                     self._jugadores[
-                        self.calcular_turno(not self._direccion_antihoraria_juego)
+                        self.calcular_turno(
+                            True if self._direccion_juego == DireccionJuego.Derecha else False
+                        )
                     ].perder_dado()
                     return True
 
-    def calcular_turno(self, direccion_antihoraria: bool):
-        if direccion_antihoraria:
+    def calcular_turno(self, direccion_derecha: bool):
+        if direccion_derecha:
             return (self._turno_actual + 1) % len(self._jugadores)
         else:
             siguiente_turno = self._turno_actual - 1
