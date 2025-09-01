@@ -317,7 +317,7 @@ class TestGestorPartida:
         gestor._ronda_especial = True
         gestor._pinta_fijada_especial = str(NombreDado.TREN).lower()
         gestor._obligador_nombre = obligador._nombre
-        gestor._modo_especial = TipoRondaEspecial.Cerrada
+        gestor._modo_especial = TipoRondaEspecial.CERRADA
         gestor._ver_propios = {obligador._nombre}
         gestor._ver_ajenos = set()
 
@@ -340,7 +340,7 @@ class TestGestorPartida:
         gestor._ronda_especial = True
         gestor._pinta_fijada_especial = str(NombreDado.TREN).lower()
         gestor._obligador_nombre = gestor._jugadores[0]._nombre
-        gestor._modo_especial = TipoRondaEspecial.Abierta
+        gestor._modo_especial = TipoRondaEspecial.ABIERTA
         gestor._ver_propios = set()
         gestor._ver_ajenos = {j._nombre for j in gestor._jugadores}
 
@@ -371,7 +371,7 @@ class TestGestorPartida:
         assert gestor._ronda_especial is True
         assert gestor._pinta_fijada_especial == str(NombreDado.TREN).lower()
         assert gestor._obligador_nombre == gestor._jugadores[0]._nombre
-        assert gestor._modo_especial == TipoRondaEspecial.Cerrada
+        assert gestor._modo_especial == TipoRondaEspecial.CERRADA
         assert gestor._ver_propios == {gestor._jugadores[0]._nombre}
         assert gestor._ver_ajenos == set()
 

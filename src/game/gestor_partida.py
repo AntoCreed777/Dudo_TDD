@@ -1,10 +1,19 @@
 """Módulo que contiene la clase GestorPartida para gestionar la lógica de la partida de Dudo."""
 
+import os
+import platform
 from enum import Enum
 
 from src.game.dado import Dado, NombreDado
 from src.game.jugador import Jugador, TipoApuesta
-from src.game.validador_apuesta import ValidadorApuesta
+from src.game.validador_apuesta import Apuesta, ValidadorApuesta
+
+
+def limpiar_terminal():
+    if platform.system() == "Windows":
+        os.system("cls")
+    else:
+        os.system("clear")
 
 
 class DireccionJuego(Enum):
@@ -17,11 +26,12 @@ class DireccionJuego(Enum):
 
 
 class TipoRondaEspecial(Enum):
-    Abierta = "Abierta"
-    Cerrada = "Cerrada"
+    CERRADA = "5"
+    ABIERTA = "6"
 
     def __str__(self):
-        return self.value
+        traduccion = {TipoRondaEspecial.ABIERTA: "Abierta", TipoRondaEspecial.CERRADA: "Cerrada"}
+        return traduccion[self]
 
 
 class GestorPartida:
@@ -79,11 +89,17 @@ class GestorPartida:
 
     def definir_primer_jugador(self):
         """Define el primer jugador que inicia la partida lanzando el dado."""
+
+        limpiar_terminal()
+        print("\nSe definirá el jugador que iniciará la primera ronda.\n")
+
         dado = Dado()
         numeros = []
-        for i in range(len(self._jugadores)):
+        for i, jugador in enumerate(self._jugadores):
+            input(f"{jugador._nombre}, presiona enter para lanzar un dado...\n")
             dado.generar_numero()
             numeros.append([i, dado.get_valor_numerico()])
+            print(f"Obtuviste un {numeros[i][1]}\n")
 
         while True:
             repeticiones = 1
@@ -100,15 +116,23 @@ class GestorPartida:
             if repeticiones == 1:
                 break
 
+            print("Ocurrio un empate.\n")
             numeros_aux = []
+            i = 0
             for num in numeros:
                 if num[1] == numero_mayor:
+                    input(
+                        f"{self._jugadores[num[0]]._nombre}, presiona enter para volver a lanzar tu dado...\n"
+                    )
                     dado.generar_numero()
                     numeros_aux.append([num[0], dado.get_valor_numerico()])
+                    print(f"Obtuviste un {numeros_aux[i][1]}\n")
+                    i += 1
 
             numeros = numeros_aux
 
         self._turno_actual = indice_numero_mayor
+        print(f"{self._jugadores[indice_numero_mayor]._nombre} iniciará la primera ronda.\n")
 
     def definir_direccion_juego(self):
         """Permite al jugador actual elegir la dirección del juego."""
@@ -118,11 +142,11 @@ class GestorPartida:
             and direccion.lower() != DireccionJuego.Izquierda.value["Numero_str"]
         ):
             mensaje = (
-                f"Jugador {self._turno_actual + 1}:\n"
-                f"Ingresa (1) si quieres que la dirección sea hacia la derecha del jugador "
-                f"{(self._turno_actual + 1) % len(self._jugadores) + 1}.\n"
-                f"Ingresa (-1) si quieres que la dirección sea hacia la izquierda del jugador "
-                f"{5 if self._turno_actual == 0 else self._turno_actual}: "
+                f"Jugador {self._turno_actual + 1}:\n\n"
+                f"Ingresa (1) si quieres que la dirección sea hacia la derecha (jugador "
+                f"{(self._turno_actual + 1) % len(self._jugadores) + 1}).\n"
+                f"Ingresa (-1) si quieres que la dirección sea hacia la izquierda (jugador "
+                f"{5 if self._turno_actual == 0 else self._turno_actual}): \n\nR: "
             )
             direccion = input(mensaje)
 
@@ -292,7 +316,10 @@ class GestorPartida:
                 eleccion = input(
                     f"{obligador._nombre}, (5) obligar cerrada: / (6) obligar abierta: "
                 )
-                if eleccion not in ("5", "6"):
+                if eleccion not in (
+                    TipoRondaEspecial.CERRADA.value,
+                    TipoRondaEspecial.ABIERTA.value,
+                ):
                     raise ValueError("Opción de obligar inválida")
                 self._pinta_fijada_especial = (
                     input("Indica la pinta fija (as/tonto/tren/cuadra/quina/sexto): ")
@@ -305,12 +332,12 @@ class GestorPartida:
                 self._obligar_usado[obligador._nombre] = True
                 self._obligador_nombre = obligador._nombre
 
-                if eleccion == "5":
-                    self._modo_especial = TipoRondaEspecial.Cerrada
+                if eleccion == TipoRondaEspecial.CERRADA.value:
+                    self._modo_especial = TipoRondaEspecial.CERRADA
                     self._ver_propios = {obligador._nombre}
                     self._ver_ajenos = set()
                 else:
-                    self._modo_especial = TipoRondaEspecial.Abierta
+                    self._modo_especial = TipoRondaEspecial.ABIERTA
                     self._ver_propios = set()
                     self._ver_ajenos = {j._nombre for j in self._jugadores}
 
@@ -422,12 +449,12 @@ class GestorPartida:
         if modo is None:
             return base
 
-        if modo == TipoRondaEspecial.Cerrada:
+        if modo == TipoRondaEspecial.CERRADA:
             if observador._nombre == objetivo._nombre:
                 return base if observador._nombre in self._ver_propios else None
             return None
 
-        if modo == TipoRondaEspecial.Abierta:
+        if modo == TipoRondaEspecial.ABIERTA:
             if observador._nombre == objetivo._nombre:
                 return None
             return base if observador._nombre in self._ver_ajenos else None
