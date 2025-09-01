@@ -10,7 +10,7 @@ class GestorPartida:
     def __init__(self, cantidad_jugadores):
         """Inicializa el gestor de partida con la cantidad de jugadores indicada."""
         self._jugadores = []
-        self._direccion_juego = 0
+        self._direccion_antihoraria_juego = None
         self._turno_actual = -1
         self._apuesta_anterior = ""
         self._apuesta_actual = ""
@@ -66,9 +66,9 @@ class GestorPartida:
             direccion = input(mensaje)
 
         if direccion == "1":
-            self._direccion_juego = 1
+            self._direccion_antihoraria_juego = True
         else:
-            self._direccion_juego = -1
+            self._direccion_antihoraria_juego = False
 
     def solicitar_apuesta_a_jugador(self) -> str:
         """Solicita al Jugador actual que realize su apuesta."""

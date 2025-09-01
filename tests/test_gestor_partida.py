@@ -32,14 +32,14 @@ class TestGestorPartida:
         assert gestor_4_jugadores._turno_actual == 3
 
     @pytest.mark.parametrize("direccion,valor", [
-        ("1", 1),
-        ("-1", -1)
+        ("1", True),
+        ("-1", False)
     ])
     def test_definir_direccion_juego(self, mocker, gestor_4_jugadores, direccion, valor):
-        """Verifica la dirección antihoraria del juego."""
+        """Verifica la eleccion de ambas direcciones del juego."""
         mocker.patch("builtins.input", return_value=direccion)
         gestor_4_jugadores.definir_direccion_juego()
-        assert gestor_4_jugadores._direccion_juego == valor
+        assert gestor_4_jugadores._direccion_antihoraria_juego == valor
 
     def test_solicitar_apuesta(self, mocker, gestor_4_jugadores):
         """Verifica que se puedan solicitar apuestas al siguiente Jugador."""
@@ -55,7 +55,7 @@ class TestGestorPartida:
     def test_eliminar_jugador(self, gestor_4_jugadores):
         """Verifica que se elimine un jugador cuando se queda sin dados."""
         cantidad_previa_jugadores = len(gestor_4_jugadores._jugadores)
-        gestor_4_jugadores._jugadores[0]._dados_en_posicion = 0
+        gestor_4_jugadores._jugadores[0]._dados_en_posecion = 0
         assert gestor_4_jugadores._jugadores[0].get_cantidad_dados() == 0
         gestor_4_jugadores.eliminar_jugador(0)
         assert len(gestor_4_jugadores._jugadores) == cantidad_previa_jugadores - 1
