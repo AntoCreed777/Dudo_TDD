@@ -41,6 +41,8 @@ class GestorPartida:
             str(NombreDado.QUINA).lower(): 0,
             str(NombreDado.SEXTO).lower(): 0,
         }
+        self._ronda_especial = False
+        self._obligar_usado = {j._nombre: False for j in self._jugadores}
 
         for _ in range(cantidad_jugadores):
             nombre = input(f"\nIngrese el nombre del jugador {_}: ")
@@ -140,6 +142,7 @@ class GestorPartida:
                     cantidad_pinta_apuesta += self._cantidad_pintas[apuesta_tokenizada[2]]
                 if cantidad_pinta_apuesta >= int(apuesta_tokenizada[1]):
                     self._jugadores[self._turno_actual].perder_dado()
+                    self._ronda_especial = False
                     return False
                 else:
                     if self._direccion_juego is None:
@@ -148,6 +151,7 @@ class GestorPartida:
                     self._jugadores[
                         self.calcular_turno(not self._direccion_juego.value["bool"])
                     ].perder_dado()
+                    self._ronda_especial = False
                     return True
         if apuesta == "calzar":
             if not self._apuesta_actual.startswith("subir"):
@@ -180,17 +184,23 @@ class GestorPartida:
             raise ValueError("No hay apuesta válida para calzar")
         cantidad_objetivo = int(prev[1])
         pinta_objetivo = prev[2]
-        cantidad = conteo[str(NombreDado.AS).lower()]
 
-        if pinta_objetivo != str(NombreDado.AS).lower():
-            cantidad += conteo[pinta_objetivo]
+        if getattr(self, "_ronda_especial", False):
+            cantidad = conteo[pinta_objetivo]
+        else:
+            cantidad = conteo[str(NombreDado.AS).lower()]
+            if pinta_objetivo != str(NombreDado.AS).lower():
+                cantidad += conteo[pinta_objetivo]
+
         self._apuesta_anterior = self._apuesta_actual
         self._apuesta_actual = apuesta
 
         if cantidad == cantidad_objetivo:
             self._jugadores[self._turno_actual]._dados_en_posecion += 1
+            self._ronda_especial = False
             return True
         self._jugadores[self._turno_actual].perder_dado()
+        self._ronda_especial = False
         return False
 
     def calcular_turno(self, direccion_derecha: bool):
@@ -210,7 +220,22 @@ class GestorPartida:
 
         hay_uno = any(j.get_cantidad_dados() == 1 for j in self._jugadores)
         if hay_uno:
-            raise NotImplementedError("Ronda especial no implementada aún")
+            obligador = None
+            for j in self._jugadores:
+                if j.get_cantidad_dados() == 1 and not getattr(self, "_obligar_usado", {}).get(
+                    j._nombre, False
+                ):
+                    obligador = j
+                    break
+
+            if obligador:
+                eleccion = input(f"{obligador._nombre}, (5) obligar cerrada: ")
+                if eleccion != "5":
+                    raise NotImplementedError("Obligar abierta aún no implementada")
+                self._ronda_especial = True
+                if not hasattr(self, "_obligar_usado"):
+                    self._obligar_usado = {}
+                self._obligar_usado[obligador._nombre] = True
 
         while True:
             apuesta = self.solicitar_apuesta_a_jugador()
