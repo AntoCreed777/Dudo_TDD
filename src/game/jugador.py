@@ -27,6 +27,7 @@ class Jugador:
 
     _cacho: Cacho
     _dados_en_posecion: int
+    _nombre: str
 
     def __init__(self, nombre):
         """Inicializa el jugador con un cacho y 5 dados en posesión."""
@@ -114,4 +115,5 @@ class Jugador:
         return self._dados_en_posecion
 
     def perder_dado(self):
+        """Resta un dado al jugador."""
         self._dados_en_posecion -= 1

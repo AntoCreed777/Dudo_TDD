@@ -39,6 +39,7 @@ class ValidadorApuesta:
         return nueva.cantidad >= actual.cantidad
 
     def _validar_cambio_a_ases(self, cantidad_actual: int, cantidad_nueva: int) -> bool:
+        """Valida el cambio de una apuesta normal a Ases."""
         if cantidad_actual % 2 == 0:
             minimo = (cantidad_actual // 2) + 1
         else:
@@ -46,5 +47,11 @@ class ValidadorApuesta:
         return cantidad_nueva >= minimo
 
     def _validar_desde_ases(self, cantidad_actual: int, cantidad_nueva: int) -> bool:
+        """Valida el cambio desde Ases hacia otra pinta."""
         minimo = (cantidad_actual * 2) + 1
         return cantidad_nueva >= minimo
+
+    def puede_calzar(self, dados_en_juego: int, dados_maximos: int, dados_del_jugador: int) -> bool:
+        """Indica si se puede calzar con los dados actuales y del jugador."""
+        mitad = (dados_maximos + 1) // 2
+        return dados_del_jugador == 1 or dados_en_juego >= mitad
