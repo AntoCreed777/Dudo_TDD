@@ -6,7 +6,7 @@ from src.game.cacho import Cacho
 from src.game.dado import NombreDado
 
 
-class Apuesta(Enum):
+class TipoApuesta(Enum):
     SUBIR = "1"
     PASAR = "2"
     DUDAR = "3"
@@ -14,10 +14,10 @@ class Apuesta(Enum):
 
     def __str__(self):
         traduccion = {
-            Apuesta.SUBIR: "subir",
-            Apuesta.PASAR: "pasar",
-            Apuesta.DUDAR: "dudar",
-            Apuesta.CALZAR: "calzar",
+            TipoApuesta.SUBIR: "subir",
+            TipoApuesta.PASAR: "pasar",
+            TipoApuesta.DUDAR: "dudar",
+            TipoApuesta.CALZAR: "calzar",
         }
         return traduccion[self]
 
@@ -89,7 +89,7 @@ class Jugador:
         while apuesta not in numeros_validos:
             apuesta = input(indicaciones)
 
-        if apuesta == Apuesta.SUBIR.value:
+        if apuesta == TipoApuesta.SUBIR.value:
             pintas = [str(pinta).lower() for pinta in NombreDado]
             apuesta = ""
             while (
@@ -101,13 +101,13 @@ class Jugador:
                     "\nIngrese la cantidad de dados seguido de la pinta a estimar "
                     "separados por un espacio (Ej: 5 tren):\nR: "
                 )
-            return (f"{Apuesta.SUBIR} " + apuesta).strip()
-        elif apuesta == Apuesta.PASAR.value:
-            return str(Apuesta.PASAR)
-        elif apuesta == Apuesta.DUDAR.value:
-            return str(Apuesta.DUDAR)
+            return (f"{TipoApuesta.SUBIR} " + apuesta).strip()
+        elif apuesta == TipoApuesta.PASAR.value:
+            return str(TipoApuesta.PASAR)
+        elif apuesta == TipoApuesta.DUDAR.value:
+            return str(TipoApuesta.DUDAR)
         else:
-            return str(Apuesta.CALZAR)
+            return str(TipoApuesta.CALZAR)
 
     def get_cantidad_dados(self) -> int:
         """Retorna la cantidad de dados en posecion."""
