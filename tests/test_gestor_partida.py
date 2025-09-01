@@ -120,3 +120,19 @@ class TestGestorPartida:
             j.agitar_cacho()
         with pytest.raises(ValueError, match="No se cumplen las condiciones para calzar"):
             gestor.procesar_apuesta("calzar")
+
+    def test_calzar_exacto_gana_un_dado(self, mocker, gestor_4_jugadores):
+        """Si el conteo coincide exactamente con la apuesta, el calzador gana 1 dado."""
+        gestor = gestor_4_jugadores
+        gestor._turno_actual = 0
+        gestor._apuesta_actual = "subir 6 tren"
+
+        side_effect = [3, 1, 6, 6, 6, 3, 3, 6, 6, 6, 1, 6, 6, 6, 6, 3, 6, 6, 6, 6]
+        mocker.patch("src.game.dado.random.randint", side_effect=side_effect)
+        for j in gestor._jugadores:
+            j.agitar_cacho()
+        antes = gestor._jugadores[0].get_cantidad_dados()
+        resultado = gestor.procesar_apuesta("calzar")
+        despues = gestor._jugadores[0].get_cantidad_dados()
+        assert resultado is True
+        assert despues == antes + 1
