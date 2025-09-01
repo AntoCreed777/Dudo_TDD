@@ -136,3 +136,19 @@ class TestGestorPartida:
         despues = gestor._jugadores[0].get_cantidad_dados()
         assert resultado is True
         assert despues == antes + 1
+
+    def test_calzar_falla_pierde_un_dado(self, mocker, gestor_4_jugadores):
+        """Si el conteo no coincide exactamente, el calzador pierde 1 dado."""
+        gestor = gestor_4_jugadores
+        gestor._turno_actual = 1
+        gestor._apuesta_actual = "subir 5 tonto"
+
+        side_effect = [1, 3, 4, 5, 6, 2, 2, 1, 6, 6, 1, 1, 4, 5, 6, 1, 1, 4, 5, 6]
+        mocker.patch("src.game.dado.random.randint", side_effect=side_effect)
+        for j in gestor._jugadores:
+            j.agitar_cacho()
+        antes = gestor._jugadores[1].get_cantidad_dados()
+        resultado = gestor.procesar_apuesta("calzar")
+        despues = gestor._jugadores[1].get_cantidad_dados()
+        assert resultado is False
+        assert despues == antes - 1
