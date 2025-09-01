@@ -249,3 +249,21 @@ class TestGestorPartida:
 
         with pytest.raises(ValueError, match="Pinta fija en ronda especial"):
             gestor.jugar_ronda()
+
+    def test_especial_otro_con_un_dado_puede_cambiar_pinta_si_sube(
+        self, mocker, gestor_4_jugadores
+    ):
+        gestor = gestor_4_jugadores
+        gestor._direccion_juego = DireccionJuego.Derecha
+        gestor._jugadores[0]._dados_en_posecion = 1
+        gestor._jugadores[2]._dados_en_posecion = 1
+        gestor._turno_actual = 1
+        mocker.patch(
+            "builtins.input", side_effect=["5", "tren", "1", "2 tren", "1", "3 tonto", "4"]
+        )
+        mocker.patch("src.game.dado.random.randint", side_effect=[3] * 20)
+        for j in gestor._jugadores:
+            j.agitar_cacho()
+
+        resultado = gestor.jugar_ronda()
+        assert resultado["termino"] is True
