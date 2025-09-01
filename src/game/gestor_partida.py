@@ -18,6 +18,13 @@ class DireccionJuego(Enum):
 class GestorPartida:
     """Clase que gestiona la partida, jugadores y turnos."""
 
+    _jugadores: list[Jugador]
+    _direccion_juego: DireccionJuego | None
+    _turno_actual: int
+    _apuesta_anterior: str
+    _apuesta_actual: str
+    _cantidad_pintas: dict[str, int]
+
     def __init__(self, cantidad_jugadores):
         """Inicializa el gestor de partida con la cantidad de jugadores indicada."""
         self._jugadores = []
@@ -74,12 +81,15 @@ class GestorPartida:
     def definir_direccion_juego(self):
         """Permite al jugador actual elegir la dirección del juego."""
         direccion = ""
-        while direccion.lower() != "1" and direccion.lower() != "-1":
+        while (
+            direccion.lower() != DireccionJuego.Derecha.value
+            and direccion.lower() != DireccionJuego.Izquierda.value
+        ):
             mensaje = (
                 f"Jugador {self._turno_actual + 1}:\n"
-                f"Ingresa (1) si quieres que la dirección sea hacia el jugador "
+                f"Ingresa (1) si quieres que la dirección sea hacia la derecha del jugador "
                 f"{(self._turno_actual + 1) % len(self._jugadores) + 1}.\n"
-                f"Ingresa (-1) si quieres que la dirección sea hacia el jugador "
+                f"Ingresa (-1) si quieres que la dirección sea hacia la izquierda del jugador "
                 f"{5 if self._turno_actual == 0 else self._turno_actual}"
             )
             direccion = input(mensaje)
@@ -110,6 +120,10 @@ class GestorPartida:
         elif apuesta == "dudar":
             for jugador in self._jugadores:
                 dados_jugador = jugador.ver_cacho()
+
+                if dados_jugador is None:
+                    raise ValueError("Error en dados de jugador")
+
                 for dado in dados_jugador:
                     self._cantidad_pintas[dado.lower()] += 1
 

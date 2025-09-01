@@ -27,6 +27,7 @@ class Jugador:
 
     _cacho: Cacho
     _dados_en_posecion: int
+    _nombre: str
 
     def __init__(self, nombre):
         """Inicializa el jugador con un cacho y 5 dados en posesión."""
