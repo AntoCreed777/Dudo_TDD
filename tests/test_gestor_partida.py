@@ -2,7 +2,7 @@
 
 import pytest
 
-from src.game.gestor_partida import GestorPartida
+from src.game.gestor_partida import DireccionJuego, GestorPartida
 
 
 @pytest.fixture(scope="function")
@@ -31,12 +31,18 @@ class TestGestorPartida:
         gestor_4_jugadores.definir_primer_jugador()
         assert gestor_4_jugadores._turno_actual == 3
 
-    @pytest.mark.parametrize("direccion,valor", [("1", True), ("-1", False)])
+    @pytest.mark.parametrize(
+        "direccion,valor",
+        [
+            (DireccionJuego.Derecha.value["Numero_str"], DireccionJuego.Derecha),
+            (DireccionJuego.Izquierda.value["Numero_str"], DireccionJuego.Izquierda),
+        ],
+    )
     def test_definir_direccion_juego(self, mocker, gestor_4_jugadores, direccion, valor):
         """Verifica la eleccion de ambas direcciones del juego."""
         mocker.patch("builtins.input", return_value=direccion)
         gestor_4_jugadores.definir_direccion_juego()
-        assert gestor_4_jugadores._direccion_antihoraria_juego == valor
+        assert gestor_4_jugadores._direccion_juego == valor
 
     def test_solicitar_apuesta(self, mocker, gestor_4_jugadores):
         """Verifica que se puedan solicitar apuestas al siguiente Jugador."""
@@ -72,7 +78,7 @@ class TestGestorPartida:
         self, mocker, gestor_4_jugadores, dado1, dado2, resultado, dados_jugador
     ):
         """Test para probar los casos de haber dudado exitosamente o incorrectamente"""
-        gestor_4_jugadores._direccion_antihoraria_juego = True
+        gestor_4_jugadores._direccion_juego = DireccionJuego.Derecha
         gestor_4_jugadores._turno_actual = 1
         gestor_4_jugadores._apuesta_actual = "subir 4 tonto"
         mocker.patch(

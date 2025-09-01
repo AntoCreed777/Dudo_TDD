@@ -7,8 +7,8 @@ from src.game.jugador import Jugador
 
 
 class DireccionJuego(Enum):
-    Derecha = "1"
-    Izquierda = "-1"
+    Derecha = {"Numero_str": "1", "bool": True}
+    Izquierda = {"Numero_str": "-1", "bool": False}
 
     def __str__(self):
         direcciones = {DireccionJuego.Derecha: "Derecha", DireccionJuego.Izquierda: "Izquierda"}
@@ -82,8 +82,8 @@ class GestorPartida:
         """Permite al jugador actual elegir la dirección del juego."""
         direccion = ""
         while (
-            direccion.lower() != DireccionJuego.Derecha.value
-            and direccion.lower() != DireccionJuego.Izquierda.value
+            direccion.lower() != DireccionJuego.Derecha.value["Numero_str"]
+            and direccion.lower() != DireccionJuego.Izquierda.value["Numero_str"]
         ):
             mensaje = (
                 f"Jugador {self._turno_actual + 1}:\n"
@@ -94,7 +94,7 @@ class GestorPartida:
             )
             direccion = input(mensaje)
 
-        if direccion == DireccionJuego.Derecha.value:
+        if direccion == DireccionJuego.Derecha.value["Numero_str"]:
             self._direccion_juego = DireccionJuego.Derecha
         else:
             self._direccion_juego = DireccionJuego.Izquierda
@@ -140,10 +140,11 @@ class GestorPartida:
                     self._jugadores[self._turno_actual].perder_dado()
                     return False
                 else:
+                    if self._direccion_juego is None:
+                        raise ValueError("Error en la direccion de Juego")
+
                     self._jugadores[
-                        self.calcular_turno(
-                            True if self._direccion_juego == DireccionJuego.Derecha else False
-                        )
+                        self.calcular_turno(self._direccion_juego.value["bool"])
                     ].perder_dado()
                     return True
 
