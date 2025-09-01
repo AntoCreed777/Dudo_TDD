@@ -384,3 +384,11 @@ class TestGestorPartida:
         assert gestor._modo_especial is None
         assert len(gestor._ver_propios) == 0
         assert len(gestor._ver_ajenos) == 0
+
+    def test_calcular_dados_en_juego(self, gestor_4_jugadores):
+        assert gestor_4_jugadores.dados_en_juego() == 20
+        gestor_4_jugadores._jugadores[0].perder_dado()
+        assert gestor_4_jugadores.dados_en_juego() == 19
+        gestor_4_jugadores._jugadores[1].perder_dado()
+        gestor_4_jugadores._jugadores[2].perder_dado()
+        assert gestor_4_jugadores.dados_en_juego() == 17
