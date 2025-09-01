@@ -11,7 +11,7 @@ class GestorPartida:
         """Inicializa el gestor de partida con la cantidad de jugadores indicada."""
         self._jugadores = []
         self._direccion_juego = 0
-        self._turno_actual = 0
+        self._turno_actual = -1
         self._apuesta_anterior = ""
         self._apuesta_actual = ""
 

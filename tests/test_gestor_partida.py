@@ -63,13 +63,23 @@ class TestGestorPartida:
         assert len(gestor_4_jugadores._jugadores) == cantidad_previa_jugadores - 1
 
     @pytest.mark.skip(reason="Test aun no implementado")
-    def test_jugar_ronda(self):
-        """Test pendiente para jugar una ronda."""
+    def test_subir_apuesta(self, mocker, gestor_4_jugadores):
+        """Test que verifica que el movimiento de subir apuesta funcione correctamente"""
+        mocker.patch("builtins.input", side_effect=["1", "3 quina"])
+        gestor_4_jugadores._turno_actual = 0
+        apuesta = gestor_4_jugadores.solicitar_apuesta_a_jugador()
+        gestor_4_jugadores.procesar_apuesta(apuesta)
+        assert gestor_4_jugadores._apuesta_actual() == "3 quina"
+
+    @pytest.mark.skip(reason="Test aun no implementado")
+    def test_resultado_dudar(self):
+        """Test pendiente para procesar un movimiento."""
         pass
 
     @pytest.mark.skip(reason="Test aun no implementado")
-    def test_procesar_movimiento(self):
-        """Test pendiente para procesar un movimiento."""
+    def test_jugar_ronda(self, mocker, gestor_4_jugadores):
+        """Test pendiente para jugar una ronda."""
+        mocker.patch("builtins.input", side_effect=["1", "3 cuadra"])
         pass
 
     @pytest.mark.skip(reason="Test aun no implementado")
