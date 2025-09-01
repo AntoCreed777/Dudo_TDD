@@ -41,7 +41,7 @@ class GestorPartida:
     _ver_ajenos: set
     _obligador_nombre: str | None
 
-    def __init__(self, cantidad_jugadores):
+    def __init__(self, cantidad_jugadores: int):
         """Inicializa el gestor de partida con la cantidad de jugadores indicada."""
         self._jugadores = []
         self._direccion_juego = None
@@ -65,8 +65,15 @@ class GestorPartida:
         self._obligador_nombre = None
 
         for _ in range(cantidad_jugadores):
-            nombre = input(f"\nIngrese el nombre del jugador {_}: ")
+            nombre = input(f"\nIngrese el nombre del jugador {_ + 1}: ")
             self._jugadores.append(Jugador(nombre))
+
+    def juego(self):
+        self.definir_primer_jugador()
+        self.definir_direccion_juego()
+
+        while True:
+            self.jugar_ronda()
 
     def definir_primer_jugador(self):
         """Define el primer jugador que inicia la partida lanzando el dado."""
@@ -113,7 +120,7 @@ class GestorPartida:
                 f"Ingresa (1) si quieres que la dirección sea hacia la derecha del jugador "
                 f"{(self._turno_actual + 1) % len(self._jugadores) + 1}.\n"
                 f"Ingresa (-1) si quieres que la dirección sea hacia la izquierda del jugador "
-                f"{5 if self._turno_actual == 0 else self._turno_actual}"
+                f"{5 if self._turno_actual == 0 else self._turno_actual}: "
             )
             direccion = input(mensaje)
 
