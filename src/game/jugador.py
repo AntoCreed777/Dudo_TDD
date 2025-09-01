@@ -115,4 +115,5 @@ class Jugador:
         return self._dados_en_posecion
 
     def perder_dado(self):
+        """Resta un dado al jugador."""
         self._dados_en_posecion -= 1

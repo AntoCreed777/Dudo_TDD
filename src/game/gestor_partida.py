@@ -112,6 +112,7 @@ class GestorPartida:
             self._jugadores.pop(indice_jugador)
 
     def procesar_apuesta(self, apuesta):
+        """Procesa una apuesta durante la ronda."""
         apuesta_tokenizada = apuesta.split(" ")
         if apuesta_tokenizada[0] == "subir":
             self._apuesta_anterior = self._apuesta_actual
@@ -149,6 +150,7 @@ class GestorPartida:
                     return True
 
     def calcular_turno(self, direccion_derecha: bool):
+        """Calcula el turno del jugador actual."""
         if direccion_derecha:
             return (self._turno_actual + 1) % len(self._jugadores)
         else:
