@@ -81,10 +81,9 @@ class GestorPartida:
         """Elimina a un Jugador de los Jugadores en Juego."""
         if self._jugadores[indice_jugador].get_cantidad_dados() == 0:
             self._jugadores.pop(indice_jugador)
-    
+
     def procesar_apuesta(self, apuesta):
         apuesta_tokenizada = apuesta.split(" ")
         self._apuesta_anterior = self._apuesta_actual
         if apuesta_tokenizada[0] == "subir":
             self._apuesta_actual = apuesta
-
