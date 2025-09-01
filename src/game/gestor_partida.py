@@ -118,7 +118,7 @@ class GestorPartida:
             self._apuesta_anterior = self._apuesta_actual
             self._apuesta_actual = apuesta
             return False
-        elif apuesta == "dudar":
+        if apuesta == "dudar":
             for jugador in self._jugadores:
                 dados_jugador = jugador.ver_cacho()
 
@@ -148,6 +148,18 @@ class GestorPartida:
                         self.calcular_turno(not self._direccion_juego.value["bool"])
                     ].perder_dado()
                     return True
+        if apuesta == "calzar":
+            if not self._apuesta_actual.startswith("subir"):
+                raise ValueError("No hay apuesta válida para calzar")
+
+            from src.game.validador_apuesta import ValidadorApuesta
+
+            validador = ValidadorApuesta()
+            dados_maximos = 5 * len(self._jugadores)
+            dados_en_juego = sum(j.get_cantidad_dados() for j in self._jugadores)
+            dados_del_jugador = self._jugadores[self._turno_actual].get_cantidad_dados()
+            if not validador.puede_calzar(dados_en_juego, dados_maximos, dados_del_jugador):
+                raise ValueError("No se cumplen las condiciones para calzar")
 
     def calcular_turno(self, direccion_derecha: bool):
         """Calcula el turno del jugador actual."""
