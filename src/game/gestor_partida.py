@@ -44,6 +44,10 @@ class GestorPartida:
         self._ronda_especial = False
         self._obligar_usado = {j._nombre: False for j in self._jugadores}
         self._pinta_fijada_especial = None
+        self._modo_especial = None
+        self._ver_propios = set()
+        self._ver_ajenos = set()
+        self._obligador_nombre = None
 
         for _ in range(cantidad_jugadores):
             nombre = input(f"\nIngrese el nombre del jugador {_}: ")
@@ -297,3 +301,18 @@ class GestorPartida:
                 continue
 
             raise ValueError("Apuesta no reconocida durante la ronda")
+
+    def ver_cacho_para(self, observador, objetivo):
+        """Qué ve 'observador' del cacho de 'objetivo'."""
+        base = objetivo.ver_cacho()
+        modo = getattr(self, "_modo_especial", None)
+
+        if modo is None:
+            return base
+
+        if modo == "cerrada":
+            if observador._nombre == objetivo._nombre:
+                return base if observador._nombre in self._ver_propios else None
+            return None
+
+        raise NotImplementedError("Modo 'abierta' no implementado")
