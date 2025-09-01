@@ -202,3 +202,32 @@ class GestorPartida:
             if siguiente_turno < 0:
                 siguiente_turno = len(self._jugadores) - 1
             return siguiente_turno
+
+    def jugar_ronda(self):
+        """Juega una ronda, termina al dudar o calzar"""
+        if self._direccion_juego is None:
+            raise ValueError("Debe definirse la direccion de Juego")
+
+        hay_uno = any(j.get_cantidad_dados() == 1 for j in self._jugadores)
+        if hay_uno:
+            raise NotImplementedError("Ronda especial no implementada aún")
+
+        while True:
+            apuesta = self.solicitar_apuesta_a_jugador()
+
+            if apuesta.startswith("subir"):
+                self.procesar_apuesta(apuesta)
+                continue
+
+            if apuesta == "dudar":
+                raise NotImplementedError("Dudar no implementado en jugar_ronda")
+
+            if apuesta == "calzar":
+                resultado = self.procesar_apuesta(apuesta)
+                return {"accion": "calzar", "termino": True, "resultado": resultado}
+
+            if apuesta == "pasar":
+                self._turno_actual = self.calcular_turno(self._direccion_juego.value["bool"])
+                continue
+
+            raise ValueError("Apuesta no reconocida durante la ronda")
