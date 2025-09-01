@@ -14,7 +14,7 @@ class Jugador:
         """Inicializa el jugador con un cacho y sin dados en posesión."""
         self._nombre = nombre
         self._cacho = Cacho()
-        self._dados_en_posecion = 0
+        self._dados_en_posecion = 5
 
     def agitar_cacho(self):
         """Agita el cacho del jugador con la cantidad de dados en posesión."""
@@ -37,6 +37,8 @@ class Jugador:
 
         for i, resultado in enumerate(resultados):
             print(f"\tDado {i + 1}: {resultado}")
+
+        return resultados
 
     def realizar_apuesta(self, apuesta_anterior: str, apuesta_actual: str) -> str:
         """Permite al Jugador realizar una apuesta."""
@@ -92,3 +94,6 @@ class Jugador:
     def get_cantidad_dados(self) -> int:
         """Retorna la cantidad de dados en posecion."""
         return self._dados_en_posecion
+
+    def perder_dado(self):
+        self._dados_en_posecion -= 1

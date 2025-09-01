@@ -1,6 +1,6 @@
 """Módulo que contiene la clase GestorPartida para gestionar la lógica de la partida de Dudo."""
 
-from src.game.dado import Dado
+from src.game.dado import Dado, NombreDado
 from src.game.jugador import Jugador
 
 
@@ -14,6 +14,14 @@ class GestorPartida:
         self._turno_actual = -1
         self._apuesta_anterior = ""
         self._apuesta_actual = ""
+        self._cantidad_pintas = {
+            "as": 0,
+            "tonto": 0,
+            "tren": 0,
+            "cuadra": 0,
+            "quina": 0,
+            "sexto": 0
+        }
 
         for _ in range(cantidad_jugadores):
             nombre = input(f"\nIngrese el nombre del jugador {_}: ")
@@ -84,6 +92,38 @@ class GestorPartida:
 
     def procesar_apuesta(self, apuesta):
         apuesta_tokenizada = apuesta.split(" ")
-        self._apuesta_anterior = self._apuesta_actual
         if apuesta_tokenizada[0] == "subir":
+            self._apuesta_anterior = self._apuesta_actual
             self._apuesta_actual = apuesta
+            return False
+        elif apuesta == "dudar":
+            for jugador in self._jugadores:
+                dados_jugador = jugador.ver_cacho()
+                for dado in dados_jugador:
+                    self._cantidad_pintas[dado.lower()] += 1
+
+            cantidad_pinta_apuesta = 0
+            apuesta_tokenizada = self._apuesta_actual.split(" ")
+            self._apuesta_anterior = self._apuesta_actual
+            self._apuesta_actual = apuesta
+
+            if apuesta_tokenizada[0] == "subir":
+                cantidad_pinta_apuesta += self._cantidad_pintas["as"]
+                if apuesta_tokenizada[2] != "as":
+                    cantidad_pinta_apuesta += self._cantidad_pintas[apuesta_tokenizada[2]]
+                if cantidad_pinta_apuesta >= int(apuesta_tokenizada[1]):
+                    self._jugadores[self._turno_actual].perder_dado()
+                    return False
+                else:
+                    self._jugadores[self.calcular_turno(
+                        not self._direccion_antihoraria_juego)].perder_dado()
+                    return True
+
+    def calcular_turno(self, direccion_antihoraria: bool):
+        if direccion_antihoraria:
+            return (self._turno_actual + 1) % len(self._jugadores)
+        else:
+            siguiente_turno = self._turno_actual - 1
+            if siguiente_turno < 0:
+                siguiente_turno = len(self._jugadores) - 1
+            return siguiente_turno

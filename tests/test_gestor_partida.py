@@ -69,17 +69,17 @@ class TestGestorPartida:
         assert gestor_4_jugadores._apuesta_actual == "subir 3 quina"
 
     @pytest.mark.parametrize("dado1,dado2,resultado,dados_jugador", [
-        (1, 1, True, 4),
-        (1, 2, False, 5),
+        (3, 3, True, 4),
+        (3, 2, False, 5),
         (2, 2, False, 5)
     ])
     def test_resultado_dudar(self, mocker, gestor_4_jugadores, dado1, dado2, resultado,
                              dados_jugador):
         """Test para probar los casos de haber dudado exitosamente o incorrectamente"""
-        gestor_4_jugadores._direccion_juego = 1
+        gestor_4_jugadores._direccion_antihoraria_juego = True
         gestor_4_jugadores._turno_actual = 1
         gestor_4_jugadores._apuesta_actual = "subir 4 tonto"
-        mocker.patch("src/game/dado/random/randint", side_effect=[3, 3, 3, 3, 3, 3, 3, 3,
+        mocker.patch("src.game.dado.random.randint", side_effect=[3, 3, 3, 3, 3, 3, 3, 3,
                                                                   3, 3, 3, 3, 3, 3, 3, 2, 2,
                                                                   2, dado1, dado2])
         for jugador in gestor_4_jugadores._jugadores:
