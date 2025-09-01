@@ -190,6 +190,7 @@ class GestorPartida:
         if cantidad == cantidad_objetivo:
             self._jugadores[self._turno_actual]._dados_en_posecion += 1
             return True
+        self._jugadores[self._turno_actual].perder_dado()
         return False
 
     def calcular_turno(self, direccion_derecha: bool):
