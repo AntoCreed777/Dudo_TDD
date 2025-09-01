@@ -29,10 +29,8 @@ class Cacho:
 
         self._cantidad_agitada = cantidad
 
-        resultados = []
         for i in range(cantidad):
             self._dados[i].generar_numero()
-            resultados.append(self._dados[i].get_valor())
 
     def get_resultados(self) -> list[str] | None:
         """Devuelve los resultados de los dados agitados si el cacho está visible."""

@@ -68,10 +68,27 @@ class TestGestorPartida:
         gestor_4_jugadores.procesar_apuesta(apuesta)
         assert gestor_4_jugadores._apuesta_actual == "subir 3 quina"
 
-    @pytest.mark.skip(reason="Test aun no implementado")
-    def test_resultado_dudar(self):
-        """Test pendiente para procesar un movimiento."""
-        pass
+    @pytest.mark.parametrize("dado1,dado2,resultado,dados_jugador", [
+        (1, 1, True, 4),
+        (1, 2, False, 5),
+        (2, 2, False, 5)
+    ])
+    def test_resultado_dudar(self, mocker, gestor_4_jugadores, dado1, dado2, resultado,
+                             dados_jugador):
+        """Test para probar los casos de haber dudado exitosamente o incorrectamente"""
+        gestor_4_jugadores._direccion_juego = 1
+        gestor_4_jugadores._turno_actual = 1
+        gestor_4_jugadores._apuesta_actual = "subir 4 tonto"
+        mocker.patch("src/game/dado/random/randint", side_effect=[3, 3, 3, 3, 3, 3, 3, 3,
+                                                                  3, 3, 3, 3, 3, 3, 3, 2, 2,
+                                                                  2, dado1, dado2])
+        for jugador in gestor_4_jugadores._jugadores:
+            jugador.agitar_cacho()
+        resultado_dudar = gestor_4_jugadores.procesar_apuesta("dudar")
+        assert gestor_4_jugadores._apuesta_anterior == "subir 4 tonto"
+        assert gestor_4_jugadores._apuesta_actual == "dudar"
+        assert resultado_dudar == resultado
+        assert gestor_4_jugadores._jugadores[0]._dados_en_posecion == dados_jugador
 
     @pytest.mark.skip(reason="Test aun no implementado")
     def test_jugar_ronda(self, mocker, gestor_4_jugadores):
