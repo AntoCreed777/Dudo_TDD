@@ -220,7 +220,8 @@ class GestorPartida:
                 continue
 
             if apuesta == "dudar":
-                raise NotImplementedError("Dudar no implementado en jugar_ronda")
+                resultado = self.procesar_apuesta(apuesta)
+                return {"accion": "dudar", "termino": True, "resultado": resultado}
 
             if apuesta == "calzar":
                 resultado = self.procesar_apuesta(apuesta)
