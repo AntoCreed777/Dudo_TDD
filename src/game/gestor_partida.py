@@ -43,6 +43,7 @@ class GestorPartida:
         }
         self._ronda_especial = False
         self._obligar_usado = {j._nombre: False for j in self._jugadores}
+        self._pinta_fijada_especial = None
 
         for _ in range(cantidad_jugadores):
             nombre = input(f"\nIngrese el nombre del jugador {_}: ")
@@ -118,6 +119,28 @@ class GestorPartida:
         """Procesa una apuesta durante la ronda."""
         apuesta_tokenizada = apuesta.split(" ")
         if apuesta_tokenizada[0] == "subir":
+            if self._ronda_especial and self._pinta_fijada_especial:
+                pinta_nueva = apuesta_tokenizada[2]
+                if pinta_nueva != self._pinta_fijada_especial:
+                    jugador = self._jugadores[self._turno_actual]
+                    cant_nueva = int(apuesta_tokenizada[1])
+
+                    cant_anterior = None
+                    if self._apuesta_actual and self._apuesta_actual.startswith("subir"):
+                        prev = self._apuesta_actual.split(" ")
+                        cant_anterior = int(prev[1])
+
+                    puede_cambiar = (
+                        jugador.get_cantidad_dados() == 1
+                        and getattr(self, "_obligador_nombre", None) is not None
+                        and jugador._nombre != self._obligador_nombre
+                        and cant_anterior is not None
+                        and cant_nueva > cant_anterior
+                    )
+                    if not puede_cambiar:
+                        raise ValueError("Pinta fija en ronda especial")
+                    self._pinta_fijada_especial = pinta_nueva
+
             self._apuesta_anterior = self._apuesta_actual
             self._apuesta_actual = apuesta
             return False
@@ -234,6 +257,11 @@ class GestorPartida:
                 )
                 if eleccion not in ("5", "6"):
                     raise ValueError("Opción de obligar inválida")
+                self._pinta_fijada_especial = (
+                    input("Indica la pinta fija (as/tonto/tren/cuadra/quina/sexto): ")
+                    .strip()
+                    .lower()
+                )
                 self._ronda_especial = True
                 if not hasattr(self, "_obligar_usado"):
                     self._obligar_usado = {}
