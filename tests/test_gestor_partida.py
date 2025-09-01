@@ -267,3 +267,27 @@ class TestGestorPartida:
 
         resultado = gestor.jugar_ronda()
         assert resultado["termino"] is True
+
+    def test_visibilidad_cerrada(self, gestor_4_jugadores):
+        """En 'cerrada': solo el obligador ve su propio cacho; nadie ve ajenos."""
+        gestor = gestor_4_jugadores
+        for j in gestor._jugadores:
+            j.agitar_cacho()
+            j._cacho.mostrar()
+
+        obligador = gestor._jugadores[0]
+        gestor._ronda_especial = True
+        gestor._pinta_fijada_especial = "tren"
+        gestor._obligador_nombre = obligador._nombre
+        gestor._modo_especial = "cerrada"
+        gestor._ver_propios = {obligador._nombre}
+        gestor._ver_ajenos = set()
+
+        assert gestor.ver_cacho_para(obligador, obligador) is not None
+        for otro in gestor._jugadores[1:]:
+            assert gestor.ver_cacho_para(otro, otro) is None
+        for obs in gestor._jugadores:
+            for obj in gestor._jugadores:
+                if obs is obj:
+                    continue
+                assert gestor.ver_cacho_para(obs, obj) is None
