@@ -313,3 +313,36 @@ class TestGestorPartida:
                 if obs is obj:
                     continue
                 assert gestor.ver_cacho_para(obs, obj) is not None
+
+    def test_reset_visibilidad_al_terminar_ronda(self, mocker, gestor_4_jugadores):
+        """Obligar configura visibilidad; al terminar (dudar) se resetea todo."""
+        gestor = gestor_4_jugadores
+        gestor._direccion_juego = DireccionJuego.Derecha
+        gestor._turno_actual = 0
+        gestor._jugadores[0]._dados_en_posecion = 1
+        gestor._apuesta_actual = "subir 2 tren"
+
+        mocker.patch("src.game.dado.random.randint", side_effect=[3, 3, 3, 3, 3] * 4)
+        for j in gestor._jugadores:
+            j.agitar_cacho()
+
+        mocker.patch("builtins.input", side_effect=["5", "tren"])
+        with pytest.raises(StopIteration):
+            _ = gestor.jugar_ronda()
+
+        assert gestor._ronda_especial is True
+        assert gestor._pinta_fijada_especial == "tren"
+        assert gestor._obligador_nombre == gestor._jugadores[0]._nombre
+        assert gestor._modo_especial == "cerrada"
+        assert gestor._ver_propios == {gestor._jugadores[0]._nombre}
+        assert gestor._ver_ajenos == set()
+
+        mocker.patch("builtins.input", side_effect=["3"])
+        _ = gestor.jugar_ronda()
+
+        assert gestor._ronda_especial is False
+        assert gestor._pinta_fijada_especial is None
+        assert gestor._obligador_nombre is None
+        assert gestor._modo_especial is None
+        assert len(gestor._ver_propios) == 0
+        assert len(gestor._ver_ajenos) == 0
