@@ -144,7 +144,7 @@ class GestorPartida:
                         raise ValueError("Error en la direccion de Juego")
 
                     self._jugadores[
-                        self.calcular_turno(self._direccion_juego.value["bool"])
+                        self.calcular_turno(not self._direccion_juego.value["bool"])
                     ].perder_dado()
                     return True
 
