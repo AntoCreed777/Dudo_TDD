@@ -31,17 +31,15 @@ class TestGestorPartida:
         gestor_4_jugadores.definir_primer_jugador()
         assert gestor_4_jugadores._turno_actual == 3
 
-    def test_definir_direccion_antihoraria_juego(self, mocker, gestor_4_jugadores):
+    @pytest.mark.parametrize("direccion,valor", [
+        ("1", 1),
+        ("-1", -1)
+    ])
+    def test_definir_direccion_juego(self, mocker, gestor_4_jugadores, direccion, valor):
         """Verifica la dirección antihoraria del juego."""
-        mocker.patch("builtins.input", return_value="1")
+        mocker.patch("builtins.input", return_value=direccion)
         gestor_4_jugadores.definir_direccion_juego()
-        assert gestor_4_jugadores._direccion_juego == 1
-
-    def test_definir_direccion_horaria_juego(self, mocker, gestor_4_jugadores):
-        """Verifica la dirección horaria del juego."""
-        mocker.patch("builtins.input", return_value="-1")
-        gestor_4_jugadores.definir_direccion_juego()
-        assert gestor_4_jugadores._direccion_juego == -1
+        assert gestor_4_jugadores._direccion_juego == valor
 
     def test_solicitar_apuesta(self, mocker, gestor_4_jugadores):
         """Verifica que se puedan solicitar apuestas al siguiente Jugador."""
