@@ -172,3 +172,22 @@ class TestGestorPartida:
         assert resultado["accion"] == "calzar"
         assert resultado["termino"] is True
         assert resultado["resultado"] is True
+
+    def test_jugar_ronda_termina_con_dudar(self, mocker, gestor_4_jugadores):
+        """Una ronda termina cuando se ejecuta 'dudar' y se resuelve la apuesta."""
+        gestor = gestor_4_jugadores
+        gestor._direccion_juego = DireccionJuego.Derecha
+        gestor._turno_actual = 1
+        gestor._apuesta_actual = "subir 4 tonto"
+
+        mocker.patch(
+            "src.game.dado.random.randint",
+            side_effect=[1, 3, 4, 5, 6, 2, 2, 1, 6, 6, 1, 1, 4, 5, 6, 1, 1, 4, 5, 6],
+        )
+        mocker.patch("builtins.input", side_effect=["1", "4 tonto", "3"])
+        for j in gestor._jugadores:
+            j.agitar_cacho()
+
+        resultado = gestor.jugar_ronda()
+        assert resultado["accion"] == "dudar"
+        assert resultado["termino"] is True
