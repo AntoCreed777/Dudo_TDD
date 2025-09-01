@@ -152,3 +152,23 @@ class TestGestorPartida:
         despues = gestor._jugadores[1].get_cantidad_dados()
         assert resultado is False
         assert despues == antes - 1
+
+    def test_jugar_ronda_termina_con_calzar(self, mocker, gestor_4_jugadores):
+        """Ronda normal: termina con 'calzar'."""
+        gestor = gestor_4_jugadores
+        gestor._direccion_juego = DireccionJuego.Derecha
+        gestor._turno_actual = 0
+        gestor._apuesta_actual = "subir 6 tren"
+
+        mocker.patch(
+            "src.game.dado.random.randint",
+            side_effect=[3, 1, 6, 6, 6, 3, 3, 6, 6, 6, 1, 6, 6, 6, 6, 3, 6, 6, 6, 6],
+        )
+        mocker.patch("builtins.input", side_effect=["1", "6 tren", "4"])
+        for j in gestor._jugadores:
+            j.agitar_cacho()
+
+        resultado = gestor.jugar_ronda()
+        assert resultado["accion"] == "calzar"
+        assert resultado["termino"] is True
+        assert resultado["resultado"] is True
