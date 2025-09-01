@@ -1,6 +1,6 @@
 """Módulo que contiene la clase GestorPartida para gestionar la lógica de la partida de Dudo."""
 
-from src.game.dado import Dado
+from src.game.dado import Dado, NombreDado
 from src.game.jugador import Jugador
 
 
@@ -15,12 +15,12 @@ class GestorPartida:
         self._apuesta_anterior = ""
         self._apuesta_actual = ""
         self._cantidad_pintas = {
-            "as": 0,
-            "tonto": 0,
-            "tren": 0,
-            "cuadra": 0,
-            "quina": 0,
-            "sexto": 0
+            str(NombreDado.AS).lower(): 0,
+            str(NombreDado.TONTO).lower(): 0,
+            str(NombreDado.TREN).lower(): 0,
+            str(NombreDado.CUADRA).lower(): 0,
+            str(NombreDado.QUINA).lower(): 0,
+            str(NombreDado.SEXTO).lower(): 0
         }
 
         for _ in range(cantidad_jugadores):
@@ -108,8 +108,8 @@ class GestorPartida:
             self._apuesta_actual = apuesta
 
             if apuesta_tokenizada[0] == "subir":
-                cantidad_pinta_apuesta += self._cantidad_pintas["as"]
-                if apuesta_tokenizada[2] != "as":
+                cantidad_pinta_apuesta += self._cantidad_pintas[str(NombreDado.AS).lower()]
+                if apuesta_tokenizada[2] != str(NombreDado.AS).lower():
                     cantidad_pinta_apuesta += self._cantidad_pintas[apuesta_tokenizada[2]]
                 if cantidad_pinta_apuesta >= int(apuesta_tokenizada[1]):
                     self._jugadores[self._turno_actual].perder_dado()

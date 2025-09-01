@@ -2,7 +2,16 @@
 
 from src.game.cacho import Cacho
 from src.game.dado import NombreDado
+from enum import Enum
 
+class Apuesta(Enum):
+    SUBIR = "subir"
+    PASAR = "pasar"
+    DUDAR = "dudar"
+    CALZAR = "calzar"
+
+    def __str__(self):
+        return self.value
 
 class Jugador:
     """Clase que representa un jugador en el juego Dudo."""
@@ -83,13 +92,13 @@ class Jugador:
                     "\nIngrese la cantidad de dados seguido de la pinta a estimar "
                     "separados por un espacio (Ej: 5 tren):\nR: "
                 )
-            return ("subir " + apuesta).strip()
+            return (f"{Apuesta.SUBIR} " + apuesta).strip()
         elif apuesta == "2":
-            return "pasar"
+            return Apuesta.PASAR
         elif apuesta == "3":
-            return "dudar"
+            return Apuesta.DUDAR
         else:
-            return "calzar"
+            return Apuesta.CALZAR
 
     def get_cantidad_dados(self) -> int:
         """Retorna la cantidad de dados en posecion."""
