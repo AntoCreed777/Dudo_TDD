@@ -48,3 +48,7 @@ class ValidadorApuesta:
     def _validar_desde_ases(self, cantidad_actual: int, cantidad_nueva: int) -> bool:
         minimo = (cantidad_actual * 2) + 1
         return cantidad_nueva >= minimo
+
+    def puede_calzar(self, dados_en_juego: int, dados_maximos: int, dados_del_jugador: int) -> bool:
+        mitad = (dados_maximos + 1) // 2
+        return dados_del_jugador == 1 or dados_en_juego >= mitad
