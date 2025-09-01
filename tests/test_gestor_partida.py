@@ -191,3 +191,26 @@ class TestGestorPartida:
         resultado = gestor.jugar_ronda()
         assert resultado["accion"] == "dudar"
         assert resultado["termino"] is True
+
+    def test_jugar_ronda_especial_termina_con_dudar_y_obligar_cerrada(
+        self, mocker, gestor_4_jugadores
+    ):
+        """Ronda especial: obligar 'cerrada', termina con 'dudar'."""
+        gestor = gestor_4_jugadores
+        gestor._direccion_juego = DireccionJuego.Derecha
+        gestor._turno_actual = 1
+        gestor._jugadores[1]._dados_en_posecion = 1
+        gestor._apuesta_actual = "subir 4 tonto"
+
+        mocker.patch(
+            "src.game.dado.random.randint",
+            side_effect=[1, 2, 2, 6, 6, 1, 2, 1, 6, 6, 6, 1, 6, 6, 6, 6],
+        )
+        mocker.patch("builtins.input", side_effect=["5", "3"])
+        for j in gestor._jugadores:
+            j.agitar_cacho()
+
+        resultado = gestor.jugar_ronda()
+        assert resultado["accion"] == "dudar"
+        assert resultado["termino"] is True
+        assert isinstance(resultado["resultado"], bool)
