@@ -88,7 +88,11 @@ class GestorPartida:
 
     def accion_dudar(self, resultado: bool) -> bool:
         if resultado:
-            indice_jugador = self.calcular_turno(not self._direccion_juego.value["bool"])
+            direccion_juego = self._direccion_juego
+            if direccion_juego is None:
+                raise TypeError("No puede ser None al momento de ejecutar esto")
+
+            indice_jugador = self.calcular_turno(not direccion_juego.value["bool"])
             jugador_perdedor = self._jugadores[indice_jugador]
             print(
                 f"¡{self._jugadores[self._turno_actual]._nombre} dudo exitosamente!\n"
@@ -501,11 +505,9 @@ class GestorPartida:
 
                 elif apuesta_tokenizada[0] == str(TipoApuesta.CALZAR):
                     if ValidadorApuesta.puede_calzar(
-                        self.dados_en_juego(),
-                        self._total_dados_iniciales,
-                        self._jugadores[
-                            self._turno_actual
-                        ],  # Esto estaba asi, da error, como estoy refactorizando nomas no lo voy a corregir
+                        dados_en_juego=self.dados_en_juego(),
+                        dados_maximos=self._total_dados_iniciales,
+                        dados_del_jugador=self._jugadores[self._turno_actual].get_cantidad_dados(),
                     ):
                         break
                 elif apuesta_tokenizada[0] == str(TipoApuesta.PASAR):
