@@ -286,7 +286,7 @@ class GestorPartida:
                     self.calcular_turno(not self._direccion_juego.value["bool"])
                 ].perder_dado()
                 return True
-        elif apuesta_tokenizada[0] == str(TipoApuesta.PASAR):
+        else:
             self._ronda_especial = False
             self._pinta_fijada_especial = None
             self._obligador_nombre = None
