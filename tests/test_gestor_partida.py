@@ -351,7 +351,7 @@ class TestGestorPartida:
         gestor_4_jugadores._jugadores[2].perder_dado()
         assert gestor_4_jugadores.dados_en_juego() == 17
 
-    def test_terminar_partida_al_dudar_bien(self, mocker, capsys):
+    def test_terminar_partida_al_dudar_bien(self, mocker):
         """Test que prueba la finalizacion de una partida despues de dudar erroneamente"""
         mocker.patch("builtins.input", side_effect=["Ricardo", "Martin"])
         gestor = GestorPartida(2)
@@ -372,11 +372,10 @@ class TestGestorPartida:
         mocker.patch.object(GestorPartida, "definir_primer_jugador", return_value=None)
         mocker.patch.object(GestorPartida, "definir_direccion_juego", return_value=None)
         gestor.juego()
-        salida = capsys.readouterr().out.splitlines()
         assert len(gestor._jugadores) == 1
         assert gestor._jugadores[0]._nombre == "Ricardo"
 
-    def test_terminar_partida_al_dudar_mal(self, mocker, capsys):
+    def test_terminar_partida_al_dudar_mal(self, mocker):
         """Test que prueba la finalizacion de una partida despues de dudar erroneamente"""
         mocker.patch("builtins.input", side_effect=["Ricardo", "Martin"])
         gestor = GestorPartida(2)
@@ -397,6 +396,5 @@ class TestGestorPartida:
         mocker.patch.object(GestorPartida, "definir_primer_jugador", return_value=None)
         mocker.patch.object(GestorPartida, "definir_direccion_juego", return_value=None)
         gestor.juego()
-        salida = capsys.readouterr().out.splitlines()
         assert len(gestor._jugadores) == 1
         assert gestor._jugadores[0]._nombre == "Martin"
