@@ -7,16 +7,15 @@ def ingresar_cantidad_jugadores() -> int:
             respuesta = int(
                 input("Ingrese la cantidad de Jugadores (Si desea salir ingrese -1):\t")
             )
-            while respuesta < 2:
-                print("\nLa cantidad mínima de jugadores es 2\n")
-                respuesta = int(
-                    input("Ingrese la cantidad de Jugadores (Si desea salir ingrese -1):\t")
-                )
         except ValueError:
             continue
 
         if respuesta == -1:
             exit(0)
+
+        if respuesta < 2:
+            print("\nLa cantidad mínima de jugadores es 2\n")
+            continue
 
         return respuesta
 
