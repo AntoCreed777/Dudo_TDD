@@ -26,7 +26,10 @@ class NombreDado(Enum):
         }
         return nombres[self]
 
-    def a_enum(pinta: str) -> int:
+    @staticmethod
+    def a_enum(pinta: str) -> "NombreDado":
+        """Convierte una cadena en minúsculas al enum correspondiente.
+        Lanza ValueError si no existe."""
         traduccion = {
             str(NombreDado.AS).lower(): NombreDado.AS,
             str(NombreDado.TONTO).lower(): NombreDado.TONTO,
@@ -35,7 +38,11 @@ class NombreDado(Enum):
             str(NombreDado.QUINA).lower(): NombreDado.QUINA,
             str(NombreDado.SEXTO).lower(): NombreDado.SEXTO,
         }
-        return traduccion[pinta]
+        pinta_normalizada = pinta.strip().lower()
+        try:
+            return traduccion[pinta_normalizada]
+        except KeyError:
+            raise ValueError(f"Pinta inválida: {pinta}")
 
 
 class Dado:
