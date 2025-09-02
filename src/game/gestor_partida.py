@@ -311,7 +311,7 @@ class GestorPartida:
                 pinta_objetivo = ref_tok[2]
 
                 if self._ronda_especial:
-                    raise NotImplementedError("No se implementa en ronda especial")
+                    cantidad_pinta_apuesta = self._cantidad_pintas[pinta_objetivo]
                 else:
                     cantidad_pinta_apuesta = self._cantidad_pintas[str(NombreDado.AS).lower()]
                     if pinta_objetivo != str(NombreDado.AS).lower():
