@@ -292,6 +292,30 @@ class GestorPartida:
                     self.calcular_turno(not self._direccion_juego.value["bool"])
                 ].perder_dado()
                 return True
+        elif apuesta_tokenizada[0] == str(TipoApuesta.PASAR):
+            self._ronda_especial = False
+            self._pinta_fijada_especial = None
+            self._obligador_nombre = None
+            self._modo_especial = None
+
+            conteo_de_pintas = self._contador_pintas.contar_pintas(
+                [self._jugadores[self.calcular_turno(not self._direccion_juego)]]
+            )
+
+            cantidad_3 = 0
+            cantidad_2 = 0
+            for pinta in conteo_de_pintas:
+                if conteo_de_pintas[pinta] == 3:
+                    cantidad_3 += 1
+                elif conteo_de_pintas[pinta] == 2:
+                    cantidad_2 += 1
+
+            # Exite una pinta que tiene 3 apariciones y otra con 2
+            if cantidad_3 == 1 and cantidad_2 == 1:
+                return False
+
+            return True
+
         else:
             if not ref_subir:
                 raise ValueError("No hay apuesta vigente para dudar")
@@ -513,28 +537,12 @@ class GestorPartida:
                 resultado = self.procesar_apuesta(apuesta)
                 self._apuesta_actual = ""
                 self._apuesta_anterior = ""
-                self._cantidad_pintas = {
-                    str(NombreDado.AS).lower(): 0,
-                    str(NombreDado.TONTO).lower(): 0,
-                    str(NombreDado.TREN).lower(): 0,
-                    str(NombreDado.CUADRA).lower(): 0,
-                    str(NombreDado.QUINA).lower(): 0,
-                    str(NombreDado.SEXTO).lower(): 0,
-                }
                 return {"accion": str(TipoApuesta.DUDAR), "termino": True, "resultado": resultado}
 
             elif apuesta == str(TipoApuesta.CALZAR):
                 resultado = self.procesar_apuesta(apuesta)
                 self._apuesta_actual = ""
                 self._apuesta_anterior = ""
-                self._cantidad_pintas = {
-                    str(NombreDado.AS).lower(): 0,
-                    str(NombreDado.TONTO).lower(): 0,
-                    str(NombreDado.TREN).lower(): 0,
-                    str(NombreDado.CUADRA).lower(): 0,
-                    str(NombreDado.QUINA).lower(): 0,
-                    str(NombreDado.SEXTO).lower(): 0,
-                }
                 return {"accion": str(TipoApuesta.CALZAR), "termino": True, "resultado": resultado}
 
             elif apuesta == str(TipoApuesta.PASAR):

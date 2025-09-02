@@ -424,17 +424,17 @@ class TestGestorPartida:
         gestor._direccion_juego = DireccionJuego.Derecha
         gestor._turno_actual = 1
         gestor._ronda_especial = True
-        gestor._pinta_fijada_especial = "tren"
-        gestor._apuesta_anterior = "subir 3 tren"
-        gestor._apuesta_actual = "pasar"
+        gestor._pinta_fijada_especial = str(NombreDado.TREN).lower()
+        gestor._apuesta_anterior = f"{str(TipoApuesta.SUBIR)} 3 {str(NombreDado.TREN).lower()}"
+        gestor._apuesta_actual = str(TipoApuesta.PASAR)
 
         tiradas = [1, 1, 3, 1, 1, 1, 1, 1, 1, 1, 1, 3, 1, 1, 1, 1, 1, 1, 1, 1]
         mocker.patch("src.game.dado.random.randint", side_effect=tiradas)
         for j in gestor._jugadores:
             j.agitar_cacho()
 
-        resultado = gestor.procesar_apuesta("dudar")
+        resultado = gestor.procesar_apuesta(str(TipoApuesta.DUDAR))
         assert resultado is True
-        assert gestor._apuesta_actual == "dudar"
+        assert gestor._apuesta_actual == str(TipoApuesta.DUDAR)
         assert gestor._ronda_especial is False
         assert gestor._pinta_fijada_especial is None
