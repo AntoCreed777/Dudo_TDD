@@ -298,8 +298,12 @@ class GestorPartida:
             self._obligador_nombre = None
             self._modo_especial = None
 
+            if self._direccion_juego is None:
+                raise ValueError("Error en la direccion de Juego")
+            turno_anterior = self.calcular_turno(not self._direccion_juego.value["bool"])
+
             conteo_de_pintas = self._contador_pintas.contar_pintas(
-                [self._jugadores[self.calcular_turno(not self._direccion_juego)]]
+                [self._jugadores[turno_anterior]]
             )
 
             cantidad_3 = 0
@@ -312,8 +316,10 @@ class GestorPartida:
 
             # Exite una pinta que tiene 3 apariciones y otra con 2
             if cantidad_3 == 1 and cantidad_2 == 1:
+                self._jugadores[self._turno_actual].perder_dado()
                 return False
 
+            self._jugadores[turno_anterior].perder_dado()
             return True
 
         else:
