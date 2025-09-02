@@ -400,15 +400,12 @@ class TestGestorPartida:
         assert gestor._jugadores[0]._nombre == "Martin"
 
     def test_dudar_despues_de_pasar_usa_ultima_subir_en_normal(self, mocker, gestor_4_jugadores):
+        """Test que prueba dudar despues de pasar"""
         gestor = gestor_4_jugadores
         gestor._direccion_juego = DireccionJuego.Derecha
         gestor._turno_actual = 0
-
-        # Última apuesta válida fue 'subir 4 tonto', luego alguien 'pasó'
         gestor._apuesta_anterior = "subir 4 tonto"
         gestor._apuesta_actual = "pasar"
-
-        # 20 tiradas (4 jugadores x 5) sin 1 ni 2 -> conteo de tontos+ases = 0
         mocker.patch(
             "src.game.dado.random.randint",
             side_effect=[3, 4, 5, 6, 6] * 4,
@@ -418,8 +415,26 @@ class TestGestorPartida:
 
         resultado = gestor.procesar_apuesta("dudar")
 
-        # Debe evaluar contra 'subir 4 tonto' (no contra 'pasar'):
-        # 0 >= 4 ? No -> pierde el anterior -> True
         assert resultado is True
-        # y deja marcada la acción como 'dudar'
         assert gestor._apuesta_actual == "dudar"
+
+    def test_dudar_despues_de_pasar_en_especial_no_cuenta_ases(self, mocker, gestor_4_jugadores):
+        """Test que duda despues de pasar en ronda especial, los ases no son comodines"""
+        gestor = gestor_4_jugadores
+        gestor._direccion_juego = DireccionJuego.Derecha
+        gestor._turno_actual = 1
+        gestor._ronda_especial = True
+        gestor._pinta_fijada_especial = "tren"
+        gestor._apuesta_anterior = "subir 3 tren"
+        gestor._apuesta_actual = "pasar"
+
+        tiradas = [1, 1, 3, 1, 1, 1, 1, 1, 1, 1, 1, 3, 1, 1, 1, 1, 1, 1, 1, 1]
+        mocker.patch("src.game.dado.random.randint", side_effect=tiradas)
+        for j in gestor._jugadores:
+            j.agitar_cacho()
+
+        resultado = gestor.procesar_apuesta("dudar")
+        assert resultado is True
+        assert gestor._apuesta_actual == "dudar"
+        assert gestor._ronda_especial is False
+        assert gestor._pinta_fijada_especial is None
