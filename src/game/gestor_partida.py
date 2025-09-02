@@ -256,12 +256,6 @@ class GestorPartida:
             raise ValueError("No hay apuesta vigente para dudar")
 
         apuesta_tokenizada = self._apuesta_actual.split(" ")
-        ref_subir = None
-
-        if self._apuesta_actual and self._apuesta_actual.startswith(str(TipoApuesta.SUBIR)):
-            ref_subir = self._apuesta_actual
-        elif self._apuesta_anterior and self._apuesta_anterior.startswith(str(TipoApuesta.SUBIR)):
-            ref_subir = self._apuesta_anterior
 
         self._apuesta_anterior = self._apuesta_actual
         self._apuesta_actual = apuesta
@@ -297,6 +291,8 @@ class GestorPartida:
             self._pinta_fijada_especial = None
             self._obligador_nombre = None
             self._modo_especial = None
+            self._ver_propios.clear()
+            self._ver_ajenos.clear()
 
             if self._direccion_juego is None:
                 raise ValueError("Error en la direccion de Juego")
@@ -306,52 +302,29 @@ class GestorPartida:
                 [self._jugadores[turno_anterior]]
             )
 
-            cantidad_3 = 0
             cantidad_2 = 0
+            cantidad_3 = 0
+            cantidad_5 = 0
+            todos_diferentes = True
             for pinta in conteo_de_pintas:
-                if conteo_de_pintas[pinta] == 3:
-                    cantidad_3 += 1
-                elif conteo_de_pintas[pinta] == 2:
+                if conteo_de_pintas[pinta] == 2:
                     cantidad_2 += 1
+                    todos_diferentes = False
+                elif conteo_de_pintas[pinta] == 3:
+                    cantidad_3 += 1
+                    todos_diferentes = False
+                elif conteo_de_pintas[pinta] == 4:
+                    todos_diferentes = False
+                elif conteo_de_pintas[pinta] == 5:
+                    cantidad_5 += 1
+                    todos_diferentes = False
 
-            # Exite una pinta que tiene 3 apariciones y otra con 2
-            if cantidad_3 == 1 and cantidad_2 == 1:
+            # Exite una pinta que tiene 3 apariciones y otra con 2, existe una pinta con 5 apariciones o todas las pintas son diferentes
+            if (cantidad_3 == 1 and cantidad_2 == 1) or cantidad_5 == 1 or todos_diferentes:
                 self._jugadores[self._turno_actual].perder_dado()
                 return False
 
             self._jugadores[turno_anterior].perder_dado()
-            return True
-
-        else:
-            if not ref_subir:
-                raise ValueError("No hay apuesta vigente para dudar")
-
-            ref_tok = ref_subir.split(" ")
-            cantidad_objetivo = int(ref_tok[1])
-            pinta_objetivo = ref_tok[2]
-
-            if self._ronda_especial:
-                cantidad_pinta_apuesta = cantidad_pintas[pinta_objetivo]
-            else:
-                cantidad_pinta_apuesta = cantidad_pintas[str(NombreDado.AS).lower()]
-                if pinta_objetivo != str(NombreDado.AS).lower():
-                    cantidad_pinta_apuesta += cantidad_pintas[pinta_objetivo]
-
-            self._ronda_especial = False
-            self._pinta_fijada_especial = None
-            self._obligador_nombre = None
-            self._modo_especial = None
-            self._ver_propios.clear()
-            self._ver_ajenos.clear()
-
-            if cantidad_pinta_apuesta >= cantidad_objetivo:
-                self._jugadores[self._turno_actual].perder_dado()
-                return False
-            if self._direccion_juego is None:
-                raise ValueError("Error en la direccion de Juego")
-
-            idx_perdedor = self.calcular_turno(not self._direccion_juego.value["bool"])
-            self._jugadores[idx_perdedor].perder_dado()
             return True
 
     def procesar_apuesta_calzar(self, apuesta) -> bool:
