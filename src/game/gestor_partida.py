@@ -250,6 +250,9 @@ class GestorPartida:
             return False
 
         elif apuesta == str(TipoApuesta.DUDAR):
+            for k in self._cantidad_pintas.keys():
+                self._cantidad_pintas[k] = 0
+
             for jugador in self._jugadores:
                 dados_jugador = jugador.ver_cacho()
 
@@ -260,14 +263,27 @@ class GestorPartida:
                     self._cantidad_pintas[dado.lower()] += 1
 
             cantidad_pinta_apuesta = 0
+            if not self._apuesta_actual:
+                raise ValueError("No hay apuesta vigente para dudar")
             apuesta_tokenizada = self._apuesta_actual.split(" ")
+            ref_subir = None
+            if self._apuesta_actual and self._apuesta_actual.startswith(str(TipoApuesta.SUBIR)):
+                ref_subir = self._apuesta_actual
+            elif self._apuesta_anterior and self._apuesta_anterior.startswith(
+                str(TipoApuesta.SUBIR)
+            ):
+                ref_subir = self._apuesta_anterior
             self._apuesta_anterior = self._apuesta_actual
             self._apuesta_actual = apuesta
 
             if apuesta_tokenizada[0] == str(TipoApuesta.SUBIR):
-                cantidad_pinta_apuesta += self._cantidad_pintas[str(NombreDado.AS).lower()]
-                if apuesta_tokenizada[2] != str(NombreDado.AS).lower():
-                    cantidad_pinta_apuesta += self._cantidad_pintas[apuesta_tokenizada[2]]
+                pinta_objetivo = apuesta_tokenizada[2]
+                if self._ronda_especial:
+                    cantidad_pinta_apuesta = self._cantidad_pintas[pinta_objetivo]
+                else:
+                    cantidad_pinta_apuesta = self._cantidad_pintas[str(NombreDado.AS).lower()]
+                    if pinta_objetivo != str(NombreDado.AS).lower():
+                        cantidad_pinta_apuesta += self._cantidad_pintas[pinta_objetivo]
 
                 self._ronda_especial = False
                 self._pinta_fijada_especial = None
@@ -280,13 +296,42 @@ class GestorPartida:
                     self._jugadores[self._turno_actual].perder_dado()
                     return False
                 else:
+                    if self._direccion_juego is None:
+                        raise ValueError("Error en la direccion de Juego")
                     self._jugadores[
                         self.calcular_turno(not self._direccion_juego.value["bool"])
                     ].perder_dado()
                     return True
             else:
-                # Implementar logica para dudar el paso
-                pass
+                if not ref_subir:
+                    raise ValueError("No hay apuesta vigente para dudar")
+
+                ref_tok = ref_subir.split(" ")
+                cantidad_objetivo = int(ref_tok[1])
+                pinta_objetivo = ref_tok[2]
+
+                if self._ronda_especial:
+                    raise NotImplementedError("No se implementa en ronda especial")
+                else:
+                    cantidad_pinta_apuesta = self._cantidad_pintas[str(NombreDado.AS).lower()]
+                    if pinta_objetivo != str(NombreDado.AS).lower():
+                        cantidad_pinta_apuesta += self._cantidad_pintas[pinta_objetivo]
+
+                self._ronda_especial = False
+                self._pinta_fijada_especial = None
+                self._obligador_nombre = None
+                self._modo_especial = None
+                self._ver_propios.clear()
+                self._ver_ajenos.clear()
+
+                if cantidad_pinta_apuesta >= cantidad_objetivo:
+                    self._jugadores[self._turno_actual].perder_dado()
+                    return False
+                if self._direccion_juego is None:
+                    raise ValueError("Error en la direccion de Juego")
+                idx_perdedor = self.calcular_turno(not self._direccion_juego.value["bool"])
+                self._jugadores[idx_perdedor].perder_dado()
+                return True
 
         elif apuesta == str(TipoApuesta.CALZAR):
             for jugador in self._jugadores:
