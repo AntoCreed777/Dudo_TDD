@@ -4,6 +4,7 @@ import os
 import platform
 from enum import Enum
 
+from src.game.contador_pintas import ContadorPintas
 from src.game.dado import Dado, NombreDado
 from src.game.jugador import Jugador, TipoApuesta
 from src.game.validador_apuesta import Apuesta, ValidadorApuesta
@@ -48,7 +49,7 @@ class GestorPartida:
     _turno_actual: int
     _apuesta_anterior: str
     _apuesta_actual: str
-    _cantidad_pintas: dict[str, int]
+    _contador_pintas: ContadorPintas
     _ronda_especial: bool
     _obligar_usado: dict[str, bool]
     _pinta_fijada_especial: str | None
@@ -65,14 +66,6 @@ class GestorPartida:
         self._turno_actual = -1
         self._apuesta_anterior = ""
         self._apuesta_actual = ""
-        self._cantidad_pintas = {
-            str(NombreDado.AS).lower(): 0,
-            str(NombreDado.TONTO).lower(): 0,
-            str(NombreDado.TREN).lower(): 0,
-            str(NombreDado.CUADRA).lower(): 0,
-            str(NombreDado.QUINA).lower(): 0,
-            str(NombreDado.SEXTO).lower(): 0,
-        }
         self._ronda_especial = False
         self._obligar_usado = {j._nombre: False for j in self._jugadores}
         self._pinta_fijada_especial = None
@@ -81,6 +74,8 @@ class GestorPartida:
         self._ver_ajenos = set()
         self._obligador_nombre = None
         self._total_dados_iniciales = 5 * cantidad_jugadores
+
+        self._contador_pintas = ContadorPintas()
 
         for _ in range(cantidad_jugadores):
             nombre = input(f"\nIngrese el nombre del jugador {_ + 1}: ")
@@ -252,17 +247,9 @@ class GestorPartida:
                 self._pinta_fijada_especial = pinta_nueva
 
     def procesar_apuesta_dudar(self, apuesta) -> bool:
-        for k in self._cantidad_pintas.keys():
-            self._cantidad_pintas[k] = 0
-
-        for jugador in self._jugadores:
-            dados_jugador = jugador.ver_cacho()
-
-            if dados_jugador is None:
-                raise ValueError("Error en dados de jugador")
-
-            for dado in dados_jugador:
-                self._cantidad_pintas[dado.lower()] += 1
+        cantidad_pintas: dict[str, int] = self._contador_pintas.contar_pintas(
+            jugadores=self._jugadores
+        )
 
         cantidad_pinta_apuesta = 0
         if not self._apuesta_actual:
@@ -282,11 +269,11 @@ class GestorPartida:
         if apuesta_tokenizada[0] == str(TipoApuesta.SUBIR):
             pinta_objetivo = apuesta_tokenizada[2]
             if self._ronda_especial:
-                cantidad_pinta_apuesta = self._cantidad_pintas[pinta_objetivo]
+                cantidad_pinta_apuesta = cantidad_pintas[pinta_objetivo]
             else:
-                cantidad_pinta_apuesta = self._cantidad_pintas[str(NombreDado.AS).lower()]
+                cantidad_pinta_apuesta = cantidad_pintas[str(NombreDado.AS).lower()]
                 if pinta_objetivo != str(NombreDado.AS).lower():
-                    cantidad_pinta_apuesta += self._cantidad_pintas[pinta_objetivo]
+                    cantidad_pinta_apuesta += cantidad_pintas[pinta_objetivo]
 
             self._ronda_especial = False
             self._pinta_fijada_especial = None
@@ -314,11 +301,11 @@ class GestorPartida:
             pinta_objetivo = ref_tok[2]
 
             if self._ronda_especial:
-                cantidad_pinta_apuesta = self._cantidad_pintas[pinta_objetivo]
+                cantidad_pinta_apuesta = cantidad_pintas[pinta_objetivo]
             else:
-                cantidad_pinta_apuesta = self._cantidad_pintas[str(NombreDado.AS).lower()]
+                cantidad_pinta_apuesta = cantidad_pintas[str(NombreDado.AS).lower()]
                 if pinta_objetivo != str(NombreDado.AS).lower():
-                    cantidad_pinta_apuesta += self._cantidad_pintas[pinta_objetivo]
+                    cantidad_pinta_apuesta += cantidad_pintas[pinta_objetivo]
 
             self._ronda_especial = False
             self._pinta_fijada_especial = None
@@ -338,12 +325,9 @@ class GestorPartida:
             return True
 
     def procesar_apuesta_calzar(self, apuesta) -> bool:
-        for jugador in self._jugadores:
-            dados_jugador = jugador.ver_cacho()
-            if dados_jugador is None:
-                raise ValueError("Error en dados de jugador")
-            for nombre_dado in dados_jugador:
-                self._cantidad_pintas[nombre_dado.lower()] += 1
+        cantidad_pintas: dict[str, int] = self._contador_pintas.contar_pintas(
+            jugadores=self._jugadores
+        )
         prev = self._apuesta_actual.split(" ")
 
         # Elige la apuesta actual o la anterior dependiendo si la actual es pasar
@@ -357,11 +341,11 @@ class GestorPartida:
 
         cantidad = 0
         if getattr(self, "_ronda_especial", False):
-            cantidad = self._cantidad_pintas[pinta_objetivo]
+            cantidad = cantidad_pintas[pinta_objetivo]
         else:
-            cantidad = self._cantidad_pintas[str(NombreDado.AS).lower()]
+            cantidad = cantidad_pintas[str(NombreDado.AS).lower()]
             if pinta_objetivo != str(NombreDado.AS).lower():
-                cantidad += self._cantidad_pintas[pinta_objetivo]
+                cantidad += cantidad_pintas[pinta_objetivo]
 
         self._apuesta_anterior = self._apuesta_actual
         self._apuesta_actual = apuesta
