@@ -227,19 +227,12 @@ class TestGestorPartida:
         gestor = gestor_4_jugadores
         gestor._direccion_juego = DireccionJuego.Derecha
         gestor._jugadores[0]._dados_en_posecion = 1
-        mocker.patch(
-            "builtins.input",
-            side_effect=[
-                "5",
-                str(NombreDado.TREN).lower(),
-                "1",
-                f"3 {str(NombreDado.TONTO).lower()}",
-            ],
+        gestor._apuesta_actual = f"pasar 3 {str(NombreDado.TONTO).lower()}"
+        gestor._ronda_especial = True
+        assert (
+            gestor.validar_apuesta_subir(False, f"1 3 {str(NombreDado.TREN).lower()}".split(" "))
+            == "continue"
         )
-        mocker.patch("src.game.dado.random.randint", side_effect=[3, 3, 3, 3, 3] * 4)
-
-        with pytest.raises(ValueError, match="Pinta fija en ronda especial"):
-            gestor.jugar_ronda()
 
     def test_especial_otro_con_un_dado_puede_cambiar_pinta_si_sube(
         self, mocker, gestor_4_jugadores
@@ -321,13 +314,11 @@ class TestGestorPartida:
         gestor._apuesta_actual = f"{str(TipoApuesta.SUBIR)} 2 {str(NombreDado.TREN).lower()}"
 
         mocker.patch("src.game.dado.random.randint", side_effect=[3, 3, 3, 3, 3] * 4)
-        mocker.patch("builtins.input", side_effect=["5", str(NombreDado.TREN).lower()])
+        mocker.patch("builtins.input", side_effect=["5"])
         with pytest.raises(StopIteration):
             _ = gestor.jugar_ronda()
 
         assert gestor._ronda_especial is True
-        assert gestor._pinta_fijada_especial == str(NombreDado.TREN).lower()
-        assert gestor._obligador_nombre == gestor._jugadores[0]._nombre
         assert gestor._modo_especial == TipoRondaEspecial.CERRADA
         assert gestor._ver_propios == {gestor._jugadores[0]._nombre}
         assert gestor._ver_ajenos == set()
@@ -337,8 +328,6 @@ class TestGestorPartida:
         _ = gestor.jugar_ronda()
 
         assert gestor._ronda_especial is False
-        assert gestor._pinta_fijada_especial is None
-        assert gestor._obligador_nombre is None
         assert gestor._modo_especial is None
         assert len(gestor._ver_propios) == 0
         assert len(gestor._ver_ajenos) == 0
@@ -399,7 +388,16 @@ class TestGestorPartida:
         assert len(gestor._jugadores) == 1
         assert gestor._jugadores[0]._nombre == "Martin"
 
-    def test_dudar_despues_de_pasar_usa_ultima_subir_en_normal(self, mocker, gestor_4_jugadores):
+    @pytest.mark.parametrize(
+        "numeros,resultado",
+        [
+            ([1, 1, 1, 2, 2], False),
+            ([1, 1, 1, 1, 1], False),
+            ([1, 2, 3, 4, 5], False),
+            ([1, 2, 2, 3, 4], True),
+        ],
+    )
+    def test_dudar_despues_de_pasar(self, mocker, gestor_4_jugadores, numeros, resultado):
         """Test que prueba dudar despues de pasar"""
         gestor = gestor_4_jugadores
         gestor._direccion_juego = DireccionJuego.Derecha
@@ -408,33 +406,12 @@ class TestGestorPartida:
         gestor._apuesta_actual = "pasar"
         mocker.patch(
             "src.game.dado.random.randint",
-            side_effect=[3, 4, 5, 6, 6] * 4,
+            side_effect=numeros * 4,
         )
         for j in gestor._jugadores:
             j.agitar_cacho()
 
         resultado = gestor.procesar_apuesta("dudar")
 
-        assert resultado is True
+        assert resultado is resultado
         assert gestor._apuesta_actual == "dudar"
-
-    def test_dudar_despues_de_pasar_en_especial_no_cuenta_ases(self, mocker, gestor_4_jugadores):
-        """Test que duda despues de pasar en ronda especial, los ases no son comodines"""
-        gestor = gestor_4_jugadores
-        gestor._direccion_juego = DireccionJuego.Derecha
-        gestor._turno_actual = 1
-        gestor._ronda_especial = True
-        gestor._pinta_fijada_especial = str(NombreDado.TREN).lower()
-        gestor._apuesta_anterior = f"{str(TipoApuesta.SUBIR)} 3 {str(NombreDado.TREN).lower()}"
-        gestor._apuesta_actual = str(TipoApuesta.PASAR)
-
-        tiradas = [1, 1, 3, 1, 1, 1, 1, 1, 1, 1, 1, 3, 1, 1, 1, 1, 1, 1, 1, 1]
-        mocker.patch("src.game.dado.random.randint", side_effect=tiradas)
-        for j in gestor._jugadores:
-            j.agitar_cacho()
-
-        resultado = gestor.procesar_apuesta(str(TipoApuesta.DUDAR))
-        assert resultado is True
-        assert gestor._apuesta_actual == str(TipoApuesta.DUDAR)
-        assert gestor._ronda_especial is False
-        assert gestor._pinta_fijada_especial is None

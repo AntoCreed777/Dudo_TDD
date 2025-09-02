@@ -24,18 +24,25 @@ class ValidadorApuesta:
         return dados_en_mano == 1 and not ya_usado
 
     @staticmethod
-    def puede_subir(actual: Apuesta, nueva: Apuesta) -> bool:
+    def puede_subir(
+        actual: Apuesta, nueva: Apuesta, ronda_especial: bool = False, con_un_dado: bool = False
+    ) -> bool:
         """Valida si una nueva apuesta es válida respecto a la actual."""
-        if actual.pinta != NombreDado.AS and nueva.pinta == NombreDado.AS:
+        if actual.pinta != NombreDado.AS and nueva.pinta == NombreDado.AS and not ronda_especial:
             return ValidadorApuesta._validar_cambio_a_ases(actual.cantidad, nueva.cantidad)
 
-        if actual.pinta == NombreDado.AS and nueva.pinta != NombreDado.AS:
+        if actual.pinta == NombreDado.AS and nueva.pinta != NombreDado.AS and not ronda_especial:
             return ValidadorApuesta._validar_desde_ases(actual.cantidad, nueva.cantidad)
 
         if nueva.cantidad > actual.cantidad:
-            return True
+            if (not ronda_especial or con_un_dado) or nueva.pinta.value == actual.pinta.value:
+                return True
+            else:
+                return False
 
-        if nueva.cantidad < actual.cantidad:
+        if nueva.cantidad < actual.cantidad or (
+            nueva.cantidad == actual.cantidad and ronda_especial
+        ):
             return False
 
         return nueva.pinta.value > actual.pinta.value
