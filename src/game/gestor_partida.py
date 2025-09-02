@@ -34,6 +34,12 @@ class TipoRondaEspecial(Enum):
         return traduccion[self]
 
 
+# Constantes de retorno
+STR_BREAK: str = "break"
+STR_CONTINUE: str = "continue"
+STR_RETORNAR_SIN_NADA = "retorno_sin_nada"
+
+
 class GestorPartida:
     """Clase que gestiona la partida, jugadores y turnos."""
 
@@ -80,6 +86,36 @@ class GestorPartida:
             nombre = input(f"\nIngrese el nombre del jugador {_ + 1}: ")
             self._jugadores.append(Jugador(nombre))
 
+    def accion_dudar(self, resultado: bool) -> bool:
+        if resultado:
+            indice_jugador = self.calcular_turno(not self._direccion_juego.value["bool"])
+            jugador_perdedor = self._jugadores[indice_jugador]
+            print(
+                f"¡{self._jugadores[self._turno_actual]._nombre} dudo exitosamente!\n"
+                f"¡{jugador_perdedor._nombre} pierde un dado!\n"
+            )
+
+            if jugador_perdedor.get_cantidad_dados() == 0:
+                self.eliminar_jugador(indice_jugador)
+                print(f"{jugador_perdedor._nombre} se ha quedado sin dados ¡Jugador eliminado!\n")
+                if len(self._jugadores) == 1:
+                    print(f"El juego a finalizado ¡{self._jugadores[0]._nombre} es el ganador!\n")
+                    return True
+
+            self._turno_actual = indice_jugador
+        else:
+            jugador_perdedor = self._jugadores[self._turno_actual]
+            print(f"¡{jugador_perdedor._nombre} dudo erroneamente y pierde un dado!\n")
+
+            if jugador_perdedor.get_cantidad_dados() == 0:
+                self.eliminar_jugador(self._turno_actual)
+                print(f"{jugador_perdedor._nombre} se ha quedado sin dados ¡Jugador eliminado!\n")
+                if len(self._jugadores) == 1:
+                    print(f"El juego a finalizado ¡{self._jugadores[0]._nombre} es el ganador!\n")
+                    return True
+
+        return False
+
     def juego(self):
         self.definir_primer_jugador()
         self.definir_direccion_juego()
@@ -87,37 +123,8 @@ class GestorPartida:
         while True:
             resultado = self.jugar_ronda()
             if resultado["accion"] == str(TipoApuesta.DUDAR):
-                if resultado["resultado"]:
-                    indice_jugador = self.calcular_turno(not self._direccion_juego.value["bool"])
-                    jugador_perdedor = self._jugadores[indice_jugador]
-                    print(
-                        f"¡{self._jugadores[self._turno_actual]._nombre} dudo exitosamente!\n"
-                        f"¡{jugador_perdedor._nombre} pierde un dado!\n"
-                    )
-                    if jugador_perdedor.get_cantidad_dados() == 0:
-                        self.eliminar_jugador(indice_jugador)
-                        print(
-                            f"{jugador_perdedor._nombre} se ha quedado sin dados ¡Jugador eliminado!\n"
-                        )
-                        if len(self._jugadores) == 1:
-                            print(
-                                f"El juego a finalizado ¡{self._jugadores[0]._nombre} es el ganador!\n"
-                            )
-                            break
-                    self._turno_actual = indice_jugador
-                else:
-                    jugador_perdedor = self._jugadores[self._turno_actual]
-                    print(f"¡{jugador_perdedor._nombre} dudo erroneamente y pierde un dado!\n")
-                    if jugador_perdedor.get_cantidad_dados() == 0:
-                        self.eliminar_jugador(self._turno_actual)
-                        print(
-                            f"{jugador_perdedor._nombre} se ha quedado sin dados ¡Jugador eliminado!\n"
-                        )
-                        if len(self._jugadores) == 1:
-                            print(
-                                f"El juego a finalizado ¡{self._jugadores[0]._nombre} es el ganador!\n"
-                            )
-                            break
+                if self.accion_dudar(resultado=resultado["resultado"]):
+                    break
             else:
                 if resultado["resultado"]:
                     jugador_ganador = self._jugadores[self._turno_actual]
@@ -217,150 +224,66 @@ class GestorPartida:
         if self._jugadores[indice_jugador].get_cantidad_dados() == 0:
             self._jugadores.pop(indice_jugador)
 
-    def procesar_apuesta(self, apuesta):
-        """Procesa una apuesta durante la ronda."""
-        apuesta_tokenizada = apuesta.split(" ")
+    def procesar_apuesta_subir(self, apuesta_tokenizada):
+        if self._ronda_especial and self._pinta_fijada_especial:
+            pinta_nueva = apuesta_tokenizada[2]
+            if pinta_nueva != self._pinta_fijada_especial:
+                jugador = self._jugadores[self._turno_actual]
+                cant_nueva = int(apuesta_tokenizada[1])
+
+                cant_anterior = None
+                if self._apuesta_actual and self._apuesta_actual.startswith(str(TipoApuesta.SUBIR)):
+                    prev = self._apuesta_actual.split(" ")
+                    cant_anterior = int(prev[1])
+
+                puede_cambiar = (
+                    jugador.get_cantidad_dados() == 1
+                    and self._obligador_nombre is not None
+                    and jugador._nombre != self._obligador_nombre
+                    and cant_anterior is not None
+                    and cant_nueva > cant_anterior
+                )
+                if not puede_cambiar:
+                    raise ValueError("Pinta fija en ronda especial")
+                self._pinta_fijada_especial = pinta_nueva
+
+    def procesar_apuesta_dudar(self, apuesta) -> bool:
+        for k in self._cantidad_pintas.keys():
+            self._cantidad_pintas[k] = 0
+
+        for jugador in self._jugadores:
+            dados_jugador = jugador.ver_cacho()
+
+            if dados_jugador is None:
+                raise ValueError("Error en dados de jugador")
+
+            for dado in dados_jugador:
+                self._cantidad_pintas[dado.lower()] += 1
+
+        cantidad_pinta_apuesta = 0
+        if not self._apuesta_actual:
+            raise ValueError("No hay apuesta vigente para dudar")
+
+        apuesta_tokenizada = self._apuesta_actual.split(" ")
+        ref_subir = None
+
+        if self._apuesta_actual and self._apuesta_actual.startswith(str(TipoApuesta.SUBIR)):
+            ref_subir = self._apuesta_actual
+        elif self._apuesta_anterior and self._apuesta_anterior.startswith(str(TipoApuesta.SUBIR)):
+            ref_subir = self._apuesta_anterior
+
+        self._apuesta_anterior = self._apuesta_actual
+        self._apuesta_actual = apuesta
+
         if apuesta_tokenizada[0] == str(TipoApuesta.SUBIR):
-            if self._ronda_especial and self._pinta_fijada_especial:
-                pinta_nueva = apuesta_tokenizada[2]
-                if pinta_nueva != self._pinta_fijada_especial:
-                    jugador = self._jugadores[self._turno_actual]
-                    cant_nueva = int(apuesta_tokenizada[1])
-
-                    cant_anterior = None
-                    if self._apuesta_actual and self._apuesta_actual.startswith(
-                        str(TipoApuesta.SUBIR)
-                    ):
-                        prev = self._apuesta_actual.split(" ")
-                        cant_anterior = int(prev[1])
-
-                    puede_cambiar = (
-                        jugador.get_cantidad_dados() == 1
-                        and self._obligador_nombre is not None
-                        and jugador._nombre != self._obligador_nombre
-                        and cant_anterior is not None
-                        and cant_nueva > cant_anterior
-                    )
-                    if not puede_cambiar:
-                        raise ValueError("Pinta fija en ronda especial")
-                    self._pinta_fijada_especial = pinta_nueva
-
-            self._apuesta_anterior = self._apuesta_actual
-            self._apuesta_actual = apuesta
-            return False
-
-        elif apuesta == str(TipoApuesta.DUDAR):
-            for k in self._cantidad_pintas.keys():
-                self._cantidad_pintas[k] = 0
-
-            for jugador in self._jugadores:
-                dados_jugador = jugador.ver_cacho()
-
-                if dados_jugador is None:
-                    raise ValueError("Error en dados de jugador")
-
-                for dado in dados_jugador:
-                    self._cantidad_pintas[dado.lower()] += 1
-
-            cantidad_pinta_apuesta = 0
-            if not self._apuesta_actual:
-                raise ValueError("No hay apuesta vigente para dudar")
-            apuesta_tokenizada = self._apuesta_actual.split(" ")
-            ref_subir = None
-            if self._apuesta_actual and self._apuesta_actual.startswith(str(TipoApuesta.SUBIR)):
-                ref_subir = self._apuesta_actual
-            elif self._apuesta_anterior and self._apuesta_anterior.startswith(
-                str(TipoApuesta.SUBIR)
-            ):
-                ref_subir = self._apuesta_anterior
-            self._apuesta_anterior = self._apuesta_actual
-            self._apuesta_actual = apuesta
-
-            if apuesta_tokenizada[0] == str(TipoApuesta.SUBIR):
-                pinta_objetivo = apuesta_tokenizada[2]
-                if self._ronda_especial:
-                    cantidad_pinta_apuesta = self._cantidad_pintas[pinta_objetivo]
-                else:
-                    cantidad_pinta_apuesta = self._cantidad_pintas[str(NombreDado.AS).lower()]
-                    if pinta_objetivo != str(NombreDado.AS).lower():
-                        cantidad_pinta_apuesta += self._cantidad_pintas[pinta_objetivo]
-
-                self._ronda_especial = False
-                self._pinta_fijada_especial = None
-                self._obligador_nombre = None
-                self._modo_especial = None
-                self._ver_propios.clear()
-                self._ver_ajenos.clear()
-
-                if cantidad_pinta_apuesta >= int(apuesta_tokenizada[1]):
-                    self._jugadores[self._turno_actual].perder_dado()
-                    return False
-                else:
-                    if self._direccion_juego is None:
-                        raise ValueError("Error en la direccion de Juego")
-                    self._jugadores[
-                        self.calcular_turno(not self._direccion_juego.value["bool"])
-                    ].perder_dado()
-                    return True
+            pinta_objetivo = apuesta_tokenizada[2]
+            if self._ronda_especial:
+                cantidad_pinta_apuesta = self._cantidad_pintas[pinta_objetivo]
             else:
-                if not ref_subir:
-                    raise ValueError("No hay apuesta vigente para dudar")
-
-                ref_tok = ref_subir.split(" ")
-                cantidad_objetivo = int(ref_tok[1])
-                pinta_objetivo = ref_tok[2]
-
-                if self._ronda_especial:
-                    cantidad_pinta_apuesta = self._cantidad_pintas[pinta_objetivo]
-                else:
-                    cantidad_pinta_apuesta = self._cantidad_pintas[str(NombreDado.AS).lower()]
-                    if pinta_objetivo != str(NombreDado.AS).lower():
-                        cantidad_pinta_apuesta += self._cantidad_pintas[pinta_objetivo]
-
-                self._ronda_especial = False
-                self._pinta_fijada_especial = None
-                self._obligador_nombre = None
-                self._modo_especial = None
-                self._ver_propios.clear()
-                self._ver_ajenos.clear()
-
-                if cantidad_pinta_apuesta >= cantidad_objetivo:
-                    self._jugadores[self._turno_actual].perder_dado()
-                    return False
-                if self._direccion_juego is None:
-                    raise ValueError("Error en la direccion de Juego")
-                idx_perdedor = self.calcular_turno(not self._direccion_juego.value["bool"])
-                self._jugadores[idx_perdedor].perder_dado()
-                return True
-
-        elif apuesta == str(TipoApuesta.CALZAR):
-            for jugador in self._jugadores:
-                dados_jugador = jugador.ver_cacho()
-                if dados_jugador is None:
-                    raise ValueError("Error en dados de jugador")
-                for nombre_dado in dados_jugador:
-                    self._cantidad_pintas[nombre_dado.lower()] += 1
-            prev = self._apuesta_actual.split(" ")
-
-            # Elige la apuesta actual o la anterior dependiendo si la actual es pasar
-            if prev[0] == str(TipoApuesta.SUBIR):
-                cantidad_objetivo = int(prev[1])
-                pinta_objetivo = prev[2]
-            else:
-                prev = self._apuesta_anterior.split(" ")
-                cantidad_objetivo = int(prev[1])
-                pinta_objetivo = prev[2]
-
-            cantidad = 0
-            if getattr(self, "_ronda_especial", False):
-                cantidad = self._cantidad_pintas[pinta_objetivo]
-            else:
-                cantidad = self._cantidad_pintas[str(NombreDado.AS).lower()]
+                cantidad_pinta_apuesta = self._cantidad_pintas[str(NombreDado.AS).lower()]
                 if pinta_objetivo != str(NombreDado.AS).lower():
-                    cantidad += self._cantidad_pintas[pinta_objetivo]
+                    cantidad_pinta_apuesta += self._cantidad_pintas[pinta_objetivo]
 
-            self._apuesta_anterior = self._apuesta_actual
-            self._apuesta_actual = apuesta
             self._ronda_especial = False
             self._pinta_fijada_especial = None
             self._obligador_nombre = None
@@ -368,12 +291,105 @@ class GestorPartida:
             self._ver_propios.clear()
             self._ver_ajenos.clear()
 
-            if cantidad == cantidad_objetivo:
-                self._jugadores[self._turno_actual].ganar_dado()
-                return True
-            else:
+            if cantidad_pinta_apuesta >= int(apuesta_tokenizada[1]):
                 self._jugadores[self._turno_actual].perder_dado()
                 return False
+            else:
+                if self._direccion_juego is None:
+                    raise ValueError("Error en la direccion de Juego")
+                self._jugadores[
+                    self.calcular_turno(not self._direccion_juego.value["bool"])
+                ].perder_dado()
+                return True
+        else:
+            if not ref_subir:
+                raise ValueError("No hay apuesta vigente para dudar")
+
+            ref_tok = ref_subir.split(" ")
+            cantidad_objetivo = int(ref_tok[1])
+            pinta_objetivo = ref_tok[2]
+
+            if self._ronda_especial:
+                cantidad_pinta_apuesta = self._cantidad_pintas[pinta_objetivo]
+            else:
+                cantidad_pinta_apuesta = self._cantidad_pintas[str(NombreDado.AS).lower()]
+                if pinta_objetivo != str(NombreDado.AS).lower():
+                    cantidad_pinta_apuesta += self._cantidad_pintas[pinta_objetivo]
+
+            self._ronda_especial = False
+            self._pinta_fijada_especial = None
+            self._obligador_nombre = None
+            self._modo_especial = None
+            self._ver_propios.clear()
+            self._ver_ajenos.clear()
+
+            if cantidad_pinta_apuesta >= cantidad_objetivo:
+                self._jugadores[self._turno_actual].perder_dado()
+                return False
+            if self._direccion_juego is None:
+                raise ValueError("Error en la direccion de Juego")
+
+            idx_perdedor = self.calcular_turno(not self._direccion_juego.value["bool"])
+            self._jugadores[idx_perdedor].perder_dado()
+            return True
+
+    def procesar_apuesta_calzar(self, apuesta) -> bool:
+        for jugador in self._jugadores:
+            dados_jugador = jugador.ver_cacho()
+            if dados_jugador is None:
+                raise ValueError("Error en dados de jugador")
+            for nombre_dado in dados_jugador:
+                self._cantidad_pintas[nombre_dado.lower()] += 1
+        prev = self._apuesta_actual.split(" ")
+
+        # Elige la apuesta actual o la anterior dependiendo si la actual es pasar
+        if prev[0] == str(TipoApuesta.SUBIR):
+            cantidad_objetivo = int(prev[1])
+            pinta_objetivo = prev[2]
+        else:
+            prev = self._apuesta_anterior.split(" ")
+            cantidad_objetivo = int(prev[1])
+            pinta_objetivo = prev[2]
+
+        cantidad = 0
+        if getattr(self, "_ronda_especial", False):
+            cantidad = self._cantidad_pintas[pinta_objetivo]
+        else:
+            cantidad = self._cantidad_pintas[str(NombreDado.AS).lower()]
+            if pinta_objetivo != str(NombreDado.AS).lower():
+                cantidad += self._cantidad_pintas[pinta_objetivo]
+
+        self._apuesta_anterior = self._apuesta_actual
+        self._apuesta_actual = apuesta
+        self._ronda_especial = False
+        self._pinta_fijada_especial = None
+        self._obligador_nombre = None
+        self._modo_especial = None
+        self._ver_propios.clear()
+        self._ver_ajenos.clear()
+
+        if cantidad == cantidad_objetivo:
+            self._jugadores[self._turno_actual].ganar_dado()
+            return True
+        else:
+            self._jugadores[self._turno_actual].perder_dado()
+            return False
+
+    def procesar_apuesta(self, apuesta) -> bool:
+        """Procesa una apuesta durante la ronda."""
+        apuesta_tokenizada = apuesta.split(" ")
+        if apuesta_tokenizada[0] == str(TipoApuesta.SUBIR):
+            self.procesar_apuesta_subir(apuesta_tokenizada)
+            self._apuesta_anterior = self._apuesta_actual
+            self._apuesta_actual = apuesta
+            return False
+
+        elif apuesta == str(TipoApuesta.DUDAR):
+            return self.procesar_apuesta_dudar(apuesta)
+
+        elif apuesta == str(TipoApuesta.CALZAR):
+            return self.procesar_apuesta_calzar(apuesta)
+
         else:
             self._apuesta_anterior = self._apuesta_actual
             self._apuesta_actual = apuesta
@@ -389,6 +405,75 @@ class GestorPartida:
                 siguiente_turno = len(self._jugadores) - 1
             return siguiente_turno
 
+    def hay_un_dado(self):
+        obligador = None
+        for j in self._jugadores:
+            if j.get_cantidad_dados() == 1 and not getattr(self, "_obligar_usado", {}).get(
+                j._nombre, False
+            ):
+                obligador = j
+                break
+
+        if obligador:
+            eleccion = input(f"{obligador._nombre}, (5) obligar cerrada: / (6) obligar abierta: ")
+            if eleccion not in (
+                TipoRondaEspecial.CERRADA.value,
+                TipoRondaEspecial.ABIERTA.value,
+            ):
+                raise ValueError("Opción de obligar inválida")
+            self._pinta_fijada_especial = (
+                input("Indica la pinta fija (as/tonto/tren/cuadra/quina/sexto): ").strip().lower()
+            )
+            self._ronda_especial = True
+            if not hasattr(self, "_obligar_usado"):
+                self._obligar_usado = {}
+            self._obligar_usado[obligador._nombre] = True
+            self._obligador_nombre = obligador._nombre
+
+            if eleccion == TipoRondaEspecial.CERRADA.value:
+                self._modo_especial = TipoRondaEspecial.CERRADA
+                self._ver_propios = {obligador._nombre}
+                self._ver_ajenos = set()
+            else:
+                self._modo_especial = TipoRondaEspecial.ABIERTA
+                self._ver_propios = set()
+                self._ver_ajenos = {j._nombre for j in self._jugadores}
+
+    def apuesta_subir(self, primer_apuesta: bool, apuesta_tokenizada) -> str:
+        if primer_apuesta:
+            if apuesta_tokenizada[2] == str(NombreDado.AS).lower():
+                if ValidadorApuesta.puede_partir_con_ases(
+                    self._jugadores[self._turno_actual]._dados_en_posecion,
+                    self._obligar_usado.get(self._jugadores[self._turno_actual]._nombre, False),
+                ):
+                    return STR_BREAK
+                else:
+                    return STR_CONTINUE
+            else:
+                return STR_BREAK
+        elif self._apuesta_actual == str(TipoApuesta.PASAR):
+            apuesta_anterior = self._apuesta_anterior.split(" ")
+            if ValidadorApuesta.puede_subir(
+                Apuesta(int(apuesta_anterior[1]), NombreDado.a_enum(apuesta_anterior[2])),
+                Apuesta(int(apuesta_tokenizada[1]), NombreDado.a_enum(apuesta_tokenizada[2])),
+            ):
+                return STR_BREAK
+        else:
+            apuesta_actual = self._apuesta_actual.split(" ")
+            print(
+                f"{int(apuesta_actual[1])}"
+                f"|{NombreDado.a_enum(apuesta_actual[2])}"
+                f"|{int(apuesta_tokenizada[1])}"
+                f"|{NombreDado.a_enum(apuesta_tokenizada[2])}"
+            )
+            if ValidadorApuesta.puede_subir(
+                Apuesta(int(apuesta_actual[1]), NombreDado.a_enum(apuesta_actual[2])),
+                Apuesta(int(apuesta_tokenizada[1]), NombreDado.a_enum(apuesta_tokenizada[2])),
+            ):
+                return STR_BREAK
+
+        return STR_RETORNAR_SIN_NADA
+
     def jugar_ronda(self):
         """Juega una ronda, termina al dudar o calzar"""
         if self._direccion_juego is None:
@@ -399,94 +484,28 @@ class GestorPartida:
 
         hay_uno = any(j.get_cantidad_dados() == 1 for j in self._jugadores)
         if hay_uno:
-            obligador = None
-            for j in self._jugadores:
-                if j.get_cantidad_dados() == 1 and not getattr(self, "_obligar_usado", {}).get(
-                    j._nombre, False
-                ):
-                    obligador = j
-                    break
-
-            if obligador:
-                eleccion = input(
-                    f"{obligador._nombre}, (5) obligar cerrada: / (6) obligar abierta: "
-                )
-                if eleccion not in (
-                    TipoRondaEspecial.CERRADA.value,
-                    TipoRondaEspecial.ABIERTA.value,
-                ):
-                    raise ValueError("Opción de obligar inválida")
-                self._pinta_fijada_especial = (
-                    input("Indica la pinta fija (as/tonto/tren/cuadra/quina/sexto): ")
-                    .strip()
-                    .lower()
-                )
-                self._ronda_especial = True
-                if not hasattr(self, "_obligar_usado"):
-                    self._obligar_usado = {}
-                self._obligar_usado[obligador._nombre] = True
-                self._obligador_nombre = obligador._nombre
-
-                if eleccion == TipoRondaEspecial.CERRADA.value:
-                    self._modo_especial = TipoRondaEspecial.CERRADA
-                    self._ver_propios = {obligador._nombre}
-                    self._ver_ajenos = set()
-                else:
-                    self._modo_especial = TipoRondaEspecial.ABIERTA
-                    self._ver_propios = set()
-                    self._ver_ajenos = {j._nombre for j in self._jugadores}
+            self.hay_un_dado()
 
         primer_apuesta = True
         while True:
             apuesta = self.solicitar_apuesta_a_jugador()
-            validador = ValidadorApuesta()
             apuesta_tokenizada = apuesta.split(" ")
             while True:
                 if apuesta_tokenizada[0] == str(TipoApuesta.SUBIR):
-                    if primer_apuesta:
-                        if apuesta_tokenizada[2] == str(NombreDado.AS).lower():
-                            if validador.puede_partir_con_ases(
-                                self._jugadores[self._turno_actual]._dados_en_posecion,
-                                self._obligar_usado.get(
-                                    self._jugadores[self._turno_actual]._nombre, False
-                                ),
-                            ):
-                                break
-                            else:
-                                continue
-                        else:
-                            break
-                    elif self._apuesta_actual == str(TipoApuesta.PASAR):
-                        apuesta_anterior = self._apuesta_anterior.split(" ")
-                        if validador.puede_subir(
-                            Apuesta(
-                                int(apuesta_anterior[1]), NombreDado.a_enum(apuesta_anterior[2])
-                            ),
-                            Apuesta(
-                                int(apuesta_tokenizada[1]), NombreDado.a_enum(apuesta_tokenizada[2])
-                            ),
-                        ):
-                            break
-                    else:
-                        apuesta_actual = self._apuesta_actual.split(" ")
-                        print(
-                            f"{int(apuesta_actual[1])}"
-                            f"|{NombreDado.a_enum(apuesta_actual[2])}"
-                            f"|{int(apuesta_tokenizada[1])}"
-                            f"|{NombreDado.a_enum(apuesta_tokenizada[2])}"
-                        )
-                        if validador.puede_subir(
-                            Apuesta(int(apuesta_actual[1]), NombreDado.a_enum(apuesta_actual[2])),
-                            Apuesta(
-                                int(apuesta_tokenizada[1]), NombreDado.a_enum(apuesta_tokenizada[2])
-                            ),
-                        ):
-                            break
+                    retorno = self.apuesta_subir(primer_apuesta, apuesta_tokenizada)
+
+                    if retorno == STR_BREAK:
+                        break
+                    elif retorno == STR_CONTINUE:
+                        continue
+
                 elif apuesta_tokenizada[0] == str(TipoApuesta.CALZAR):
-                    if validador.puede_calzar(
+                    if ValidadorApuesta.puede_calzar(
                         self.dados_en_juego(),
                         self._total_dados_iniciales,
-                        self._jugadores[self._turno_actual],
+                        self._jugadores[
+                            self._turno_actual
+                        ],  # Esto estaba asi, da error, como estoy refactorizando nomas no lo voy a corregir
                     ):
                         break
                 elif apuesta_tokenizada[0] == str(TipoApuesta.PASAR):
@@ -499,12 +518,12 @@ class GestorPartida:
 
             primer_apuesta = False
 
-            if apuesta.startswith("subir"):
+            if apuesta.startswith(str(TipoApuesta.SUBIR)):
                 self.procesar_apuesta(apuesta)
                 self._turno_actual = self.calcular_turno(self._direccion_juego.value["bool"])
                 continue
 
-            elif apuesta == "dudar":
+            elif apuesta == str(TipoApuesta.DUDAR):
                 resultado = self.procesar_apuesta(apuesta)
                 self._apuesta_actual = ""
                 self._apuesta_anterior = ""
@@ -516,9 +535,9 @@ class GestorPartida:
                     str(NombreDado.QUINA).lower(): 0,
                     str(NombreDado.SEXTO).lower(): 0,
                 }
-                return {"accion": "dudar", "termino": True, "resultado": resultado}
+                return {"accion": str(TipoApuesta.DUDAR), "termino": True, "resultado": resultado}
 
-            elif apuesta == "calzar":
+            elif apuesta == str(TipoApuesta.CALZAR):
                 resultado = self.procesar_apuesta(apuesta)
                 self._apuesta_actual = ""
                 self._apuesta_anterior = ""
@@ -530,9 +549,9 @@ class GestorPartida:
                     str(NombreDado.QUINA).lower(): 0,
                     str(NombreDado.SEXTO).lower(): 0,
                 }
-                return {"accion": "calzar", "termino": True, "resultado": resultado}
+                return {"accion": str(TipoApuesta.CALZAR), "termino": True, "resultado": resultado}
 
-            elif apuesta == "pasar":
+            elif apuesta == str(TipoApuesta.PASAR):
                 self.procesar_apuesta(apuesta)
                 self._turno_actual = self.calcular_turno(self._direccion_juego.value["bool"])
                 continue

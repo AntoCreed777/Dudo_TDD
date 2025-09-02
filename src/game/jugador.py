@@ -78,7 +78,7 @@ class Jugador:
             "Ingrese el número correspondiente a la apuesta que quiere realizar:\n1: Subir\n"
         )
         if hay_apuesta_actual:
-            if apuesta_actual != "pasar":
+            if apuesta_actual != str(TipoApuesta.PASAR):
                 indicaciones += "2: Pasar\n"
                 numeros_validos.append("2")
 

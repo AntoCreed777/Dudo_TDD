@@ -18,17 +18,19 @@ class Apuesta:
 class ValidadorApuesta:
     """Clase que valida las apuestas en el juego Dudo."""
 
-    def puede_partir_con_ases(self, dados_en_mano: int, ya_usado: bool = False) -> bool:
+    @staticmethod
+    def puede_partir_con_ases(dados_en_mano: int, ya_usado: bool = False) -> bool:
         """Verifica si se puede partir con ases según los dados en mano y si ya se usó."""
         return dados_en_mano == 1 and not ya_usado
 
-    def puede_subir(self, actual: Apuesta, nueva: Apuesta) -> bool:
+    @staticmethod
+    def puede_subir(actual: Apuesta, nueva: Apuesta) -> bool:
         """Valida si una nueva apuesta es válida respecto a la actual."""
         if actual.pinta != NombreDado.AS and nueva.pinta == NombreDado.AS:
-            return self._validar_cambio_a_ases(actual.cantidad, nueva.cantidad)
+            return ValidadorApuesta._validar_cambio_a_ases(actual.cantidad, nueva.cantidad)
 
         if actual.pinta == NombreDado.AS and nueva.pinta != NombreDado.AS:
-            return self._validar_desde_ases(actual.cantidad, nueva.cantidad)
+            return ValidadorApuesta._validar_desde_ases(actual.cantidad, nueva.cantidad)
 
         if nueva.cantidad > actual.cantidad:
             return True
@@ -38,7 +40,8 @@ class ValidadorApuesta:
 
         return nueva.pinta.value > actual.pinta.value
 
-    def _validar_cambio_a_ases(self, cantidad_actual: int, cantidad_nueva: int) -> bool:
+    @staticmethod
+    def _validar_cambio_a_ases(cantidad_actual: int, cantidad_nueva: int) -> bool:
         """Valida el cambio de una apuesta normal a Ases."""
         if cantidad_actual % 2 == 0:
             minimo = (cantidad_actual // 2) + 1
@@ -46,12 +49,14 @@ class ValidadorApuesta:
             minimo = (cantidad_actual + 1) // 2
         return cantidad_nueva >= minimo
 
-    def _validar_desde_ases(self, cantidad_actual: int, cantidad_nueva: int) -> bool:
+    @staticmethod
+    def _validar_desde_ases(cantidad_actual: int, cantidad_nueva: int) -> bool:
         """Valida el cambio desde Ases hacia otra pinta."""
         minimo = (cantidad_actual * 2) + 1
         return cantidad_nueva >= minimo
 
-    def puede_calzar(self, dados_en_juego: int, dados_maximos: int, dados_del_jugador: int) -> bool:
+    @staticmethod
+    def puede_calzar(dados_en_juego: int, dados_maximos: int, dados_del_jugador: int) -> bool:
         """Indica si se puede calzar con los dados actuales y del jugador."""
         mitad = (dados_maximos + 1) // 2
         return dados_del_jugador == 1 or dados_en_juego >= mitad
