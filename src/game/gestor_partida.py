@@ -85,7 +85,56 @@ class GestorPartida:
         self.definir_direccion_juego()
 
         while True:
-            self.jugar_ronda()
+            resultado = self.jugar_ronda()
+            if resultado["accion"] == str(TipoApuesta.DUDAR):
+                if resultado["resultado"]:
+                    indice_jugador = self.calcular_turno(not self._direccion_juego.value["bool"])
+                    jugador_perdedor = self._jugadores[indice_jugador]
+                    print(
+                        f"¡{self._jugadores[self._turno_actual]._nombre} dudo exitosamente!\n"
+                        f"¡{jugador_perdedor._nombre} pierde un dado!\n"
+                    )
+                    if jugador_perdedor.get_cantidad_dados() == 0:
+                        self.eliminar_jugador(indice_jugador)
+                        print(
+                            f"{jugador_perdedor._nombre} se ha quedado sin dados ¡Jugador eliminado!\n"
+                        )
+                        if len(self._jugadores) == 1:
+                            print(
+                                f"El juego a finalizado ¡{self._jugadores[0]._nombre} es el ganador!\n"
+                            )
+                            break
+                    self._turno_actual = indice_jugador
+                else:
+                    jugador_perdedor = self._jugadores[self._turno_actual]
+                    print(f"¡{jugador_perdedor._nombre} dudo erroneamente y pierde un dado!\n")
+                    if jugador_perdedor.get_cantidad_dados() == 0:
+                        self.eliminar_jugador(self._turno_actual)
+                        print(
+                            f"{jugador_perdedor._nombre} se ha quedado sin dados ¡Jugador eliminado!\n"
+                        )
+                        if len(self._jugadores) == 1:
+                            print(
+                                f"El juego a finalizado ¡{self._jugadores[0]._nombre} es el ganador!\n"
+                            )
+                            break
+            else:
+                if resultado["resultado"]:
+                    jugador_ganador = self._jugadores[self._turno_actual]
+                    print(f"¡{jugador_ganador._nombre} calzo exitosamente y gano un dado!\n")
+                else:
+                    jugador_perdedor = self._jugadores[self._turno_actual]
+                    print(f"¡{jugador_perdedor._nombre} calzo erroneamente y pierde un dado!\n")
+                    if jugador_perdedor.get_cantidad_dados() == 0:
+                        self.eliminar_jugador(self._turno_actual)
+                        print(
+                            f"{jugador_perdedor._nombre} se ha quedado sin dados ¡Jugador eliminado!\n"
+                        )
+                        if len(self._jugadores) == 1:
+                            print(
+                                f"El juego a finalizado ¡{self._jugadores[0]._nombre} es el ganador!\n"
+                            )
+                            break
 
     def definir_primer_jugador(self):
         """Define el primer jugador que inicia la partida lanzando el dado."""
