@@ -73,7 +73,10 @@ class Jugador:
         elif hay_apuesta_actual:
             indicaciones += f"Apuesta actual: {apuesta_actual}\n"
 
-        indicaciones += f"{self._nombre}, Ingrese el número correspondiente a la apuesta que quiere realizar:\n1: Subir\n"
+        indicaciones += (
+            f"{self._nombre}, "
+            "Ingrese el número correspondiente a la apuesta que quiere realizar:\n1: Subir\n"
+        )
         if hay_apuesta_actual:
             if apuesta_actual != "pasar":
                 indicaciones += "2: Pasar\n"

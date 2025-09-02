@@ -122,7 +122,8 @@ class GestorPartida:
             for num in numeros:
                 if num[1] == numero_mayor:
                     input(
-                        f"{self._jugadores[num[0]]._nombre}, presiona enter para volver a lanzar tu dado...\n"
+                        f"{self._jugadores[num[0]]._nombre}, "
+                        "presiona enter para volver a lanzar tu dado...\n"
                     )
                     dado.generar_numero()
                     numeros_aux.append([num[0], dado.get_valor_numerico()])
@@ -375,7 +376,10 @@ class GestorPartida:
                     else:
                         apuesta_actual = self._apuesta_actual.split(" ")
                         print(
-                            f"{int(apuesta_actual[1])}|{NombreDado.a_enum(apuesta_actual[2])}|{int(apuesta_tokenizada[1])}|{NombreDado.a_enum(apuesta_tokenizada[2])}"
+                            f"{int(apuesta_actual[1])}"
+                            f"|{NombreDado.a_enum(apuesta_actual[2])}"
+                            f"|{int(apuesta_tokenizada[1])}"
+                            f"|{NombreDado.a_enum(apuesta_tokenizada[2])}"
                         )
                         if validador.puede_subir(
                             Apuesta(int(apuesta_actual[1]), NombreDado.a_enum(apuesta_actual[2])),
