@@ -74,7 +74,7 @@ class TestGestorPartida:
         assert len(gestor_4_jugadores._jugadores) == cantidad_previa_jugadores - 1
 
     def test_subir_apuesta(self, mocker, gestor_4_jugadores):
-        """Test que verifica que el movimiento de subir apuesta funcione correctamente"""
+        """Test que verifica que el movimiento de subir apuesta funcione correctamente."""
         mocker.patch(
             "builtins.input",
             side_effect=[TipoApuesta.SUBIR.value, f"3 {str(NombreDado.QUINA).lower()}"],
@@ -93,7 +93,7 @@ class TestGestorPartida:
     def test_resultado_dudar(
         self, mocker, gestor_4_jugadores, dado1, dado2, resultado, dados_jugador
     ):
-        """Test para probar los casos de haber dudado exitosamente o incorrectamente"""
+        """Test para probar los casos de haber dudado exitosamente o incorrectamente."""
         gestor_4_jugadores._direccion_juego = DireccionJuego.Derecha
         gestor_4_jugadores._turno_actual = 1
         gestor_4_jugadores._apuesta_actual = (
@@ -223,7 +223,8 @@ class TestGestorPartida:
         assert resultado["termino"] is True
         assert resultado["resultado"] in (True, False)
 
-    def test_especial_no_puede_cambiar_pinta_fijada(self, mocker, gestor_4_jugadores):
+    def test_especial_no_puede_cambiar_pinta_fijada(self, gestor_4_jugadores):
+        """Test que valida que no se pueda subir la pinta en la ronda especial."""
         gestor = gestor_4_jugadores
         gestor._direccion_juego = DireccionJuego.Derecha
         gestor._jugadores[0]._dados_en_posecion = 1
@@ -237,6 +238,12 @@ class TestGestorPartida:
     def test_especial_otro_con_un_dado_puede_cambiar_pinta_si_sube(
         self, mocker, gestor_4_jugadores
     ):
+        """
+        Test que valida durante la partida especial.
+
+        Si hay otro jugador ademas del que invoco la partida especial con un solo dado,
+        este puede cambiar la pinta fija solo si es que la sube.
+        """
         gestor = gestor_4_jugadores
         gestor._direccion_juego = DireccionJuego.Derecha
         gestor._jugadores[0]._dados_en_posecion = 1
@@ -333,6 +340,7 @@ class TestGestorPartida:
         assert len(gestor._ver_ajenos) == 0
 
     def test_calcular_dados_en_juego(self, gestor_4_jugadores):
+        """Test para validar que se cuentan bien la cantidad de Dados en juego."""
         assert gestor_4_jugadores.dados_en_juego() == 20
         gestor_4_jugadores._jugadores[0].perder_dado()
         assert gestor_4_jugadores.dados_en_juego() == 19
@@ -341,7 +349,7 @@ class TestGestorPartida:
         assert gestor_4_jugadores.dados_en_juego() == 17
 
     def test_terminar_partida_al_dudar_bien(self, mocker):
-        """Test que prueba la finalizacion de una partida despues de dudar erroneamente"""
+        """Test que prueba la finalizacion de una partida despues de dudar bien."""
         mocker.patch("builtins.input", side_effect=["Ricardo", "Martin"])
         gestor = GestorPartida(2)
         gestor._jugadores[1]._dados_en_posecion = 1
@@ -365,7 +373,7 @@ class TestGestorPartida:
         assert gestor._jugadores[0]._nombre == "Ricardo"
 
     def test_terminar_partida_al_dudar_mal(self, mocker):
-        """Test que prueba la finalizacion de una partida despues de dudar erroneamente"""
+        """Test que prueba la finalizacion de una partida despues de dudar erroneamente."""
         mocker.patch("builtins.input", side_effect=["Ricardo", "Martin"])
         gestor = GestorPartida(2)
         gestor._jugadores[0]._dados_en_posecion = 1
@@ -398,7 +406,7 @@ class TestGestorPartida:
         ],
     )
     def test_dudar_despues_de_pasar(self, mocker, gestor_4_jugadores, numeros, resultado):
-        """Test que prueba dudar despues de pasar"""
+        """Test que prueba dudar despues de pasar."""
         gestor = gestor_4_jugadores
         gestor._direccion_juego = DireccionJuego.Derecha
         gestor._turno_actual = 0

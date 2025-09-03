@@ -52,7 +52,10 @@ class TestValidadorApuesta:
         assert validador.puede_partir_con_ases(dados_en_mano=1, ya_usado=False)
 
     def test_puede_calzar(self, validador):
-        """Se puede calzar si hay la mitad o más de los dados máximos en juego,
+        """
+        Test que valida si se puede calzar o no.
+
+        Se puede calzar si hay la mitad o más de los dados máximos en juego,
         o el jugador que calza tiene 1 dado.
         """
         assert validador.puede_calzar(dados_en_juego=12, dados_maximos=20, dados_del_jugador=3)

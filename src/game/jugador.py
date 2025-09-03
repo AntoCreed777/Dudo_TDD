@@ -7,12 +7,19 @@ from src.game.dado import NombreDado
 
 
 class TipoApuesta(Enum):
+    """
+    Enumeracion que posee los Tipos de Apuestas Validas en el Juego Dudo.
+
+    El value asignado es un numero en string el cual indica que numero de opcion es.
+    """
+
     SUBIR = "1"
     PASAR = "2"
     DUDAR = "3"
     CALZAR = "4"
 
     def __str__(self):
+        """Al usar str() se retorna el Tipo de Apuesta pero en minusculas."""
         traduccion = {
             TipoApuesta.SUBIR: "subir",
             TipoApuesta.PASAR: "pasar",
@@ -123,5 +130,5 @@ class Jugador:
         self._dados_en_posecion -= 1
 
     def ganar_dado(self):
-        """Suma un dado al jugador"""
+        """Suma un dado al jugador."""
         self._dados_en_posecion += 1

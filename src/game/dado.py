@@ -28,8 +28,11 @@ class NombreDado(Enum):
 
     @staticmethod
     def a_enum(pinta: str) -> "NombreDado":
-        """Convierte una cadena en minúsculas al enum correspondiente.
-        Lanza ValueError si no existe."""
+        """
+        Convierte una cadena en minúsculas al enum correspondiente.
+
+        Lanza ValueError si no existe.
+        """
         traduccion = {
             str(NombreDado.AS).lower(): NombreDado.AS,
             str(NombreDado.TONTO).lower(): NombreDado.TONTO,

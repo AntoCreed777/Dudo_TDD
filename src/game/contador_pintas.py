@@ -10,6 +10,7 @@ class ContadorPintas:
     nombres_dados: list[str]
 
     def __init__(self):
+        """Inicia los nombres de las caras de los Dados a contar."""
         self.nombres_dados = [
             str(NombreDado.AS).lower(),
             str(NombreDado.TONTO).lower(),
