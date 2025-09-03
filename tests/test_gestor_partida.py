@@ -13,6 +13,13 @@ def gestor_4_jugadores(mocker):
     return GestorPartida(4)
 
 
+@pytest.fixture(scope="function")
+def gestor_2_jugadores(mocker):
+    """Fixture que retorna un GestorPartida con 2 jugadores"""
+    mocker.patch("builtins.input", side_effect=["Pepa", "Pepe"])
+    return GestorPartida(2)
+
+
 class TestGestorPartida:
     """Tests para la gestión de partida en Dudo."""
 
@@ -423,3 +430,124 @@ class TestGestorPartida:
 
     #     assert resultado is resultado
     #     assert gestor._apuesta_actual == "dudar"
+
+    def test_juego_completo(self, mocker, gestor_2_jugadores):
+        gestor = gestor_2_jugadores
+
+        mocker.patch.object(gestor, "definir_primer_jugador", return_value=None)
+        mocker.patch.object(gestor, "definir_direccion_juego", return_value=None)
+        gestor._turno_actual = 0
+        gestor._direccion_juego = DireccionJuego.Derecha
+        side_effect = [
+            3,
+            6,
+            2,
+            4,
+            1,
+            3,
+            5,
+            1,
+            2,
+            2,
+            3,
+            6,
+            2,
+            4,
+            1,
+            3,
+            5,
+            1,
+            2,
+            3,
+            6,
+            2,
+            4,
+            1,
+            3,
+            5,
+            1,
+            3,
+            6,
+            2,
+            4,
+            1,
+            3,
+            5,
+            1,
+            3,
+            6,
+            2,
+            4,
+            1,
+            3,
+            5,
+            3,
+            6,
+            2,
+            4,
+            1,
+            3,
+            3,
+            6,
+            2,
+            4,
+            1,
+            3,
+            5,
+            3,
+            6,
+            2,
+            4,
+            1,
+            3,
+        ]
+        mocker.patch("src.game.dado.random.randint", side_effect=side_effect)
+        side_effect2 = [
+            TipoApuesta.SUBIR.value,
+            "3 tonto",
+            TipoApuesta.PASAR.value,
+            TipoApuesta.DUDAR.value,
+            # Pepa pierde 1 dado
+            TipoApuesta.SUBIR.value,
+            "2 tren",
+            TipoApuesta.SUBIR.value,
+            "2 cuadra",
+            TipoApuesta.SUBIR.value,
+            "4 cuadra",
+            TipoApuesta.DUDAR.value,
+            # Pepa pierde 1 dado
+            TipoApuesta.SUBIR.value,
+            "3 cuadra",
+            TipoApuesta.CALZAR.value,
+            # Pepe gana 1 dado
+            TipoApuesta.SUBIR.value,
+            "3 sexto",
+            TipoApuesta.DUDAR.value,
+            # Pepa pierde 1 dado
+            TipoApuesta.SUBIR.value,
+            "1 quina",
+            TipoApuesta.SUBIR.value,
+            "3 quina",
+            TipoApuesta.CALZAR.value,
+            # Pepa pierde 1 dado
+            TipoRondaEspecial.CERRADA.value,
+            TipoApuesta.SUBIR.value,
+            "2 tren",
+            TipoApuesta.SUBIR.value,
+            "3 tren",
+            TipoApuesta.CALZAR.value,
+            # Pepa gana 1 dado
+            TipoApuesta.SUBIR.value,
+            "4 sexto",
+            TipoApuesta.DUDAR.value,
+            # Pepa pierde 1 dado
+            TipoApuesta.SUBIR.value,
+            "4 tonto",
+            TipoApuesta.DUDAR.value,
+            # Pepa pierde su ultimo dado
+        ]
+        mocker.patch("builtins.input", side_effect=side_effect2)
+        gestor.juego()
+        assert len(gestor._jugadores) == 1
+        assert gestor._jugadores[0]._nombre == "Pepa"
+        assert gestor._jugadores[0]._dados_en_posecion == 6
