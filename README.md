@@ -99,7 +99,7 @@ Para correr todos los tests:
 pytest
 ```
 
-> !NOTE
+> [!NOTE]
 > pytest ya se encuentra configurado con tal de que reporte el coverage de los test, por lo que no es necesario agregar las flags
 
 ### 5. Linting y tipado
