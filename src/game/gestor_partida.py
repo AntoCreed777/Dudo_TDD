@@ -16,6 +16,7 @@ STR_CONTINUE: str = "continue"
 
 
 def limpiar_terminal():
+    """Limpia la terminal según el sistema operativo."""
     if platform.system() == "Windows":
         os.system("cls")
     else:
@@ -23,20 +24,26 @@ def limpiar_terminal():
 
 
 class DireccionJuego(Enum):
+    """Dirección de turno en la partida: derecha o izquierda."""
+
     Derecha = {"Numero_str": "1", "bool": True}
     Izquierda = {"Numero_str": "-1", "bool": False}
 
     def __str__(self):
+        """Devuelve la representación legible de la dirección."""
         direcciones = {DireccionJuego.Derecha: "Derecha", DireccionJuego.Izquierda: "Izquierda"}
         return direcciones[self]
 
 
 class TipoRondaEspecial(Enum):
+    """Tipos de ronda especial: abierta, cerrada o normal."""
+
     CERRADA = "5"
     ABIERTA = "6"
     NORMAL = "7"
 
     def __str__(self):
+        """Devuelve la representación legible del modo de ronda especial."""
         traduccion = {
             TipoRondaEspecial.ABIERTA: "Abierta",
             TipoRondaEspecial.CERRADA: "Cerrada",
@@ -82,6 +89,7 @@ class GestorPartida:
             self._jugadores.append(Jugador(nombre))
 
     def juego(self):
+        """Ejecuta el bucle principal del juego hasta que exista un ganador."""
         self.definir_primer_jugador()
         self.definir_direccion_juego()
 
@@ -109,6 +117,14 @@ class GestorPartida:
                             break
 
     def accion_dudar(self, resultado: bool) -> bool:
+        """Resuelve los efectos de 'dudar' y actualiza turnos/estado.
+
+        Args:
+            resultado: True si pierde el jugador anterior; False si pierde quien duda.
+
+        Returns:
+            True si la partida terminó tras esta resolución, False en caso contrario.
+        """
         if resultado:
             direccion_juego = self._direccion_juego
             if direccion_juego is None:
@@ -143,7 +159,7 @@ class GestorPartida:
         return False
 
     def jugar_ronda(self):
-        """Juega una ronda, termina al dudar o calzar"""
+        """Juega una ronda, termina al dudar o calzar."""
         if self._direccion_juego is None:
             raise ValueError("Debe definirse la direccion de Juego")
 
@@ -190,6 +206,12 @@ class GestorPartida:
                 return resultado
 
     def procesar_apuesta(self, apuesta: str):
+        """Procesa una apuesta y, si corresponde, finaliza la ronda.
+
+        Para 'subir' y 'pasar' avanza el turno y la ronda continúa (retorna False).
+        Para 'dudar' y 'calzar' resuelve el resultado y retorna un diccionario con:
+        {'accion', 'termino': bool, 'resultado': bool}.
+        """
         if apuesta.startswith(str(TipoApuesta.SUBIR)):
             self._apuesta_anterior = self._apuesta_actual
             self._apuesta_actual = apuesta
@@ -248,6 +270,7 @@ class GestorPartida:
             return False
 
     def resetear_atributos(self):
+        """Restablece flags y estado temporal al terminar una ronda."""
         self._apuesta_actual = ""
         self._apuesta_anterior = ""
         self._ronda_especial = False
@@ -256,6 +279,10 @@ class GestorPartida:
         self._ver_ajenos.clear()
 
     def hay_un_dado(self):
+        """Activa ronda especial (abierta/cerrada) si un jugador puede 'obligar'.
+
+        Configura modo de visibilidad y marca uso de 'obligar' por jugador.
+        """
         obligador = None
         for j in self._jugadores:
             if j.get_cantidad_dados() == 1 and not getattr(self, "_obligar_usado", {}).get(
@@ -300,7 +327,6 @@ class GestorPartida:
 
     def definir_primer_jugador(self):
         """Define el primer jugador que inicia la partida lanzando el dado."""
-
         limpiar_terminal()
         print("\nSe definirá el jugador que iniciará la primera ronda.\n")
 
@@ -375,6 +401,10 @@ class GestorPartida:
         return apuesta
 
     def validar_apuesta_subir(self, primer_apuesta: bool, apuesta_tokenizada) -> str:
+        """Valida 'subir' en el contexto actual y guía el bucle de entrada.
+
+        Devuelve STR_BREAK para aceptar la jugada o STR_CONTINUE para solicitar otra.
+        """
         if primer_apuesta:
             if apuesta_tokenizada[2] == str(NombreDado.AS).lower():
                 if ValidadorApuesta.puede_partir_con_ases(
@@ -443,6 +473,7 @@ class GestorPartida:
         raise ValueError("Modo especial desconocido")
 
     def dados_en_juego(self):
+        """Devuelve el total de dados actualmente en juego."""
         total = 0
         for jugador in self._jugadores:
             total += jugador._dados_en_posecion

@@ -57,3 +57,12 @@ class TestDado:
         dado._valor = None
         with pytest.raises(ValueError, match="No se ha generado ningún valor todavía"):
             dado.get_valor()
+
+
+class TestNombreDado:
+    """Tests para Enum NombreDado."""
+
+    def test_a_enum_pinta_invalida(self):
+        """Lanza ValueError al intentar convertir una pinta inválida a enum."""
+        with pytest.raises(ValueError, match="Pinta inválida: test"):
+            NombreDado.a_enum("test")

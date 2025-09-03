@@ -21,7 +21,12 @@ Implementación de un simulador del juego chileno llamado "Dudo" que maneje la l
     - [Testing, Linting y Tipado](#testing-linting-y-tipado)
     - [Integración continua](#integración-continua)
   - [📋 Requisitos Previos](#-requisitos-previos)
-  - [⚙️ Instalación](#️-instalación)
+  - [🚀 Cómo ejecutar y probar el proyecto](#-cómo-ejecutar-y-probar-el-proyecto)
+    - [1. Instalar pdm (si no lo tienes)](#1-instalar-pdm-si-no-lo-tienes)
+    - [2. Instalar dependencias](#2-instalar-dependencias)
+    - [3. Ejecutar el simulador](#3-ejecutar-el-simulador)
+    - [4. Ejecutar los tests](#4-ejecutar-los-tests)
+    - [5. Linting y tipado](#5-linting-y-tipado)
   - [🗂️ Estructura del Proyecto](#️-estructura-del-proyecto)
   - [🧪 Metodología de Desarrollo](#-metodología-de-desarrollo)
   - [📚 Documentación del Código](#-documentación-del-código)
@@ -56,12 +61,59 @@ Implementación de un simulador del juego chileno llamado "Dudo" que maneje la l
 - **Python 3.8+**
 - **pdm** para gestión de dependencias y entornos
 
-## ⚙️ Instalación
+## 🚀 Cómo ejecutar y probar el proyecto
+
+### 1. Instalar pdm (si no lo tienes)
+
+```bash
+pip install pdm
+```
+
+### 2. Instalar dependencias
 
 ```bash
 git clone https://github.com/AntoCreed777/Dudo_TDD
 cd Dudo_TDD
 pdm install
+```
+
+### 3. Ejecutar el simulador
+
+Puedes correr el simulador desde la raíz del proyecto:
+
+```bash
+pdm run python src/main.py
+```
+
+O directamente con Python si tienes el entorno activado:
+
+```bash
+python src/main.py
+```
+
+### 4. Ejecutar los tests
+
+Para correr todos los tests:
+
+```bash
+pytest
+```
+
+> [!NOTE]
+> pytest ya se encuentra configurado con tal de que reporte el coverage de los test, por lo que no es necesario agregar las flags
+
+### 5. Linting y tipado
+
+Para revisar el estilo de código:
+
+```bash
+pdm run flake8 src/
+```
+
+Para revisar el tipado:
+
+```bash
+pdm run mypy src/
 ```
 
 ## 🗂️ Estructura del Proyecto

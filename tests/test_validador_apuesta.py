@@ -62,3 +62,14 @@ class TestValidadorApuesta:
         assert validador.puede_calzar(dados_en_juego=10, dados_maximos=20, dados_del_jugador=5)
         assert not validador.puede_calzar(dados_en_juego=9, dados_maximos=20, dados_del_jugador=2)
         assert validador.puede_calzar(dados_en_juego=9, dados_maximos=20, dados_del_jugador=1)
+
+    def test_puede_subir_sube_cantidad_errado(self, validador):
+        """Verifica que en ronda especial no se permita subir cantidad de forma inválida."""
+        assert (
+            validador.puede_subir(
+                actual=Apuesta(3, NombreDado.QUINA),
+                nueva=Apuesta(4, NombreDado.SEXTO),
+                ronda_especial=True,
+            )
+            is False
+        )
