@@ -14,7 +14,8 @@ class TestContadorPintas:
         """Fixture que retorna ContadorPintas."""
         return ContadorPintas()
 
-    def test_contar_pintas(self, mocker, contador_pintas):
+    def test_contar_pintas_error_dados_jugador(self, mocker, contador_pintas):
+        """Test que valida que se lanze la excepcion cuando ocurre el error."""
         jugador = Jugador("Test")
         mocker.patch.object(jugador, "ver_cacho", return_value=None)
 
