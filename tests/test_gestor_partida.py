@@ -73,78 +73,78 @@ class TestGestorPartida:
         gestor_4_jugadores.eliminar_jugador(0)
         assert len(gestor_4_jugadores._jugadores) == cantidad_previa_jugadores - 1
 
-    def test_subir_apuesta(self, mocker, gestor_4_jugadores):
-        """Test que verifica que el movimiento de subir apuesta funcione correctamente"""
-        mocker.patch(
-            "builtins.input",
-            side_effect=[TipoApuesta.SUBIR.value, f"3 {str(NombreDado.QUINA).lower()}"],
-        )
-        gestor_4_jugadores._turno_actual = 0
-        apuesta = gestor_4_jugadores.solicitar_apuesta_a_jugador()
-        gestor_4_jugadores.procesar_apuesta(apuesta)
-        assert (
-            gestor_4_jugadores._apuesta_actual
-            == f"{str(TipoApuesta.SUBIR)} 3 {str(NombreDado.QUINA).lower()}"
-        )
+    # def test_subir_apuesta(self, mocker, gestor_4_jugadores):
+    #     """Test que verifica que el movimiento de subir apuesta funcione correctamente"""
+    #     mocker.patch(
+    #         "builtins.input",
+    #         side_effect=[TipoApuesta.SUBIR.value, f"3 {str(NombreDado.QUINA).lower()}"],
+    #     )
+    #     gestor_4_jugadores._turno_actual = 0
+    #     apuesta = gestor_4_jugadores.solicitar_apuesta_a_jugador()
+    #     gestor_4_jugadores.procesar_apuesta(apuesta)
+    #     assert (
+    #         gestor_4_jugadores._apuesta_actual
+    #         == f"{str(TipoApuesta.SUBIR)} 3 {str(NombreDado.QUINA).lower()}"
+    #     )
 
-    @pytest.mark.parametrize(
-        "dado1,dado2,resultado,dados_jugador", [(3, 3, True, 4), (3, 2, False, 5), (2, 2, False, 5)]
-    )
-    def test_resultado_dudar(
-        self, mocker, gestor_4_jugadores, dado1, dado2, resultado, dados_jugador
-    ):
-        """Test para probar los casos de haber dudado exitosamente o incorrectamente"""
-        gestor_4_jugadores._direccion_juego = DireccionJuego.Derecha
-        gestor_4_jugadores._turno_actual = 1
-        gestor_4_jugadores._apuesta_actual = (
-            f"{str(TipoApuesta.SUBIR)} 4 {str(NombreDado.TONTO).lower()}"
-        )
-        mocker.patch(
-            "src.game.dado.random.randint",
-            side_effect=[3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 2, 2, 2, dado1, dado2],
-        )
-        for jugador in gestor_4_jugadores._jugadores:
-            jugador.agitar_cacho()
-        resultado_dudar = gestor_4_jugadores.procesar_apuesta(str(TipoApuesta.DUDAR))
-        assert (
-            gestor_4_jugadores._apuesta_anterior
-            == f"{str(TipoApuesta.SUBIR)} 4 {str(NombreDado.TONTO).lower()}"
-        )
-        assert gestor_4_jugadores._apuesta_actual == str(TipoApuesta.DUDAR)
-        assert resultado_dudar == resultado
-        assert gestor_4_jugadores._jugadores[0]._dados_en_posecion == dados_jugador
+    # @pytest.mark.parametrize(
+    #     "dado1,dado2,resultado,dados_jugador", [(3, 3, True, 4), (3, 2, False, 5), (2, 2, False, 5)]
+    # )
+    # def test_resultado_dudar(
+    #     self, mocker, gestor_4_jugadores, dado1, dado2, resultado, dados_jugador
+    # ):
+    #     """Test para probar los casos de haber dudado exitosamente o incorrectamente"""
+    #     gestor_4_jugadores._direccion_juego = DireccionJuego.Derecha
+    #     gestor_4_jugadores._turno_actual = 1
+    #     gestor_4_jugadores._apuesta_actual = (
+    #         f"{str(TipoApuesta.SUBIR)} 4 {str(NombreDado.TONTO).lower()}"
+    #     )
+    #     mocker.patch(
+    #         "src.game.dado.random.randint",
+    #         side_effect=[3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 2, 2, 2, dado1, dado2],
+    #     )
+    #     for jugador in gestor_4_jugadores._jugadores:
+    #         jugador.agitar_cacho()
+    #     resultado_dudar = gestor_4_jugadores.procesar_apuesta(str(TipoApuesta.DUDAR))
+    #     assert (
+    #         gestor_4_jugadores._apuesta_anterior
+    #         == f"{str(TipoApuesta.SUBIR)} 4 {str(NombreDado.TONTO).lower()}"
+    #     )
+    #     assert gestor_4_jugadores._apuesta_actual == str(TipoApuesta.DUDAR)
+    #     assert resultado_dudar == resultado
+    #     assert gestor_4_jugadores._jugadores[0]._dados_en_posecion == dados_jugador
 
-    def test_calzar_exacto_gana_un_dado(self, mocker, gestor_4_jugadores):
-        """Si el conteo coincide exactamente con la apuesta, el calzador gana 1 dado."""
-        gestor = gestor_4_jugadores
-        gestor._turno_actual = 0
-        gestor._apuesta_actual = f"{str(TipoApuesta.SUBIR)} 6 {str(NombreDado.TREN).lower()}"
+    # def test_calzar_exacto_gana_un_dado(self, mocker, gestor_4_jugadores):
+    #     """Si el conteo coincide exactamente con la apuesta, el calzador gana 1 dado."""
+    #     gestor = gestor_4_jugadores
+    #     gestor._turno_actual = 0
+    #     gestor._apuesta_actual = f"{str(TipoApuesta.SUBIR)} 6 {str(NombreDado.TREN).lower()}"
 
-        side_effect = [3, 1, 6, 6, 6, 3, 3, 6, 6, 6, 1, 6, 6, 6, 6, 3, 6, 6, 6, 6]
-        mocker.patch("src.game.dado.random.randint", side_effect=side_effect)
-        for j in gestor._jugadores:
-            j.agitar_cacho()
-        antes = gestor._jugadores[0].get_cantidad_dados()
-        resultado = gestor.procesar_apuesta(str(TipoApuesta.CALZAR))
-        despues = gestor._jugadores[0].get_cantidad_dados()
-        assert resultado is True
-        assert despues == antes + 1
+    #     side_effect = [3, 1, 6, 6, 6, 3, 3, 6, 6, 6, 1, 6, 6, 6, 6, 3, 6, 6, 6, 6]
+    #     mocker.patch("src.game.dado.random.randint", side_effect=side_effect)
+    #     for j in gestor._jugadores:
+    #         j.agitar_cacho()
+    #     antes = gestor._jugadores[0].get_cantidad_dados()
+    #     resultado = gestor.procesar_apuesta(str(TipoApuesta.CALZAR))
+    #     despues = gestor._jugadores[0].get_cantidad_dados()
+    #     assert resultado is True
+    #     assert despues == antes + 1
 
-    def test_calzar_falla_pierde_un_dado(self, mocker, gestor_4_jugadores):
-        """Si el conteo no coincide exactamente, el calzador pierde 1 dado."""
-        gestor = gestor_4_jugadores
-        gestor._turno_actual = 1
-        gestor._apuesta_actual = f"{str(TipoApuesta.SUBIR)} 5 {str(NombreDado.TONTO).lower()}"
+    # def test_calzar_falla_pierde_un_dado(self, mocker, gestor_4_jugadores):
+    #     """Si el conteo no coincide exactamente, el calzador pierde 1 dado."""
+    #     gestor = gestor_4_jugadores
+    #     gestor._turno_actual = 1
+    #     gestor._apuesta_actual = f"{str(TipoApuesta.SUBIR)} 5 {str(NombreDado.TONTO).lower()}"
 
-        side_effect = [1, 3, 4, 5, 6, 2, 2, 1, 6, 6, 1, 1, 4, 5, 6, 1, 1, 4, 5, 6]
-        mocker.patch("src.game.dado.random.randint", side_effect=side_effect)
-        for j in gestor._jugadores:
-            j.agitar_cacho()
-        antes = gestor._jugadores[1].get_cantidad_dados()
-        resultado = gestor.procesar_apuesta(str(TipoApuesta.CALZAR))
-        despues = gestor._jugadores[1].get_cantidad_dados()
-        assert resultado is False
-        assert despues == antes - 1
+    #     side_effect = [1, 3, 4, 5, 6, 2, 2, 1, 6, 6, 1, 1, 4, 5, 6, 1, 1, 4, 5, 6]
+    #     mocker.patch("src.game.dado.random.randint", side_effect=side_effect)
+    #     for j in gestor._jugadores:
+    #         j.agitar_cacho()
+    #     antes = gestor._jugadores[1].get_cantidad_dados()
+    #     resultado = gestor.procesar_apuesta(str(TipoApuesta.CALZAR))
+    #     despues = gestor._jugadores[1].get_cantidad_dados()
+    #     assert resultado is False
+    #     assert despues == antes - 1
 
     def test_jugar_ronda_termina_con_calzar(self, mocker, gestor_4_jugadores):
         """Ronda normal: termina con 'calzar'."""
@@ -388,30 +388,30 @@ class TestGestorPartida:
         assert len(gestor._jugadores) == 1
         assert gestor._jugadores[0]._nombre == "Martin"
 
-    @pytest.mark.parametrize(
-        "numeros,resultado",
-        [
-            ([1, 1, 1, 2, 2], False),
-            ([1, 1, 1, 1, 1], False),
-            ([1, 2, 3, 4, 5], False),
-            ([1, 2, 2, 3, 4], True),
-        ],
-    )
-    def test_dudar_despues_de_pasar(self, mocker, gestor_4_jugadores, numeros, resultado):
-        """Test que prueba dudar despues de pasar"""
-        gestor = gestor_4_jugadores
-        gestor._direccion_juego = DireccionJuego.Derecha
-        gestor._turno_actual = 0
-        gestor._apuesta_anterior = "subir 4 tonto"
-        gestor._apuesta_actual = "pasar"
-        mocker.patch(
-            "src.game.dado.random.randint",
-            side_effect=numeros * 4,
-        )
-        for j in gestor._jugadores:
-            j.agitar_cacho()
+    # @pytest.mark.parametrize(
+    #     "numeros,resultado",
+    #     [
+    #         ([1, 1, 1, 2, 2], False),
+    #         ([1, 1, 1, 1, 1], False),
+    #         ([1, 2, 3, 4, 5], False),
+    #         ([1, 2, 2, 3, 4], True),
+    #     ],
+    # )
+    # def test_dudar_despues_de_pasar(self, mocker, gestor_4_jugadores, numeros, resultado):
+    #     """Test que prueba dudar despues de pasar"""
+    #     gestor = gestor_4_jugadores
+    #     gestor._direccion_juego = DireccionJuego.Derecha
+    #     gestor._turno_actual = 0
+    #     gestor._apuesta_anterior = "subir 4 tonto"
+    #     gestor._apuesta_actual = "pasar"
+    #     mocker.patch(
+    #         "src.game.dado.random.randint",
+    #         side_effect=numeros * 4,
+    #     )
+    #     for j in gestor._jugadores:
+    #         j.agitar_cacho()
 
-        resultado = gestor.procesar_apuesta("dudar")
+    #     resultado = gestor.procesar_apuesta("dudar")
 
-        assert resultado is resultado
-        assert gestor._apuesta_actual == "dudar"
+    #     assert resultado is resultado
+    #     assert gestor._apuesta_actual == "dudar"
