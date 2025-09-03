@@ -60,8 +60,9 @@ class TestDado:
 
 
 class TestNombreDado:
-    """Tests para Enum NombreDado"""
+    """Tests para Enum NombreDado."""
 
     def test_a_enum_pinta_invalida(self):
+        """Lanza ValueError al intentar convertir una pinta inválida a enum."""
         with pytest.raises(ValueError, match="Pinta inválida: test"):
             NombreDado.a_enum("test")

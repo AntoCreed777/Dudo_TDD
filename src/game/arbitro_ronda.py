@@ -6,6 +6,8 @@ from src.game.jugador import Jugador, TipoApuesta
 
 
 class ArbitroRonda:
+    """Árbitro puro de ronda: funciones estáticas para resolver apuestas."""
+
     @staticmethod
     def procesar_apuesta(
         apuesta_anterior: str,
@@ -29,6 +31,11 @@ class ArbitroRonda:
     def procesar_apuesta_dudar(
         apuesta_actual: str, jugadores: list[Jugador], es_ronda_especial: bool, turno_anterior: int
     ) -> bool:
+        """Resuelve una acción 'dudar' contra la apuesta vigente.
+
+        En ronda especial los As no son comodín; en normal sí.
+        Retorna True si pierde el jugador anterior, False si pierde quien dudó.
+        """
         contador_pintas = ContadorPintas()
         cantidad_pintas: dict[str, int] = contador_pintas.contar_pintas(jugadores=jugadores)
 
@@ -82,6 +89,11 @@ class ArbitroRonda:
         jugadores: list[Jugador],
         es_ronda_especial: bool,
     ) -> bool:
+        """Evalúa un 'calzar' verificando coincidencia exacta con la apuesta.
+
+        Usa la apuesta actual si es 'subir'; en caso contrario, la apuesta anterior.
+        En ronda especial los As no son comodín; en normal sí.
+        """
         contador_pintas = ContadorPintas()
         cantidad_pintas: dict[str, int] = contador_pintas.contar_pintas(jugadores=jugadores)
         prev = apuesta_actual.split(" ")
